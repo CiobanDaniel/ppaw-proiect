@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Creator Hub Admin{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #f5f7fb; }
+        .navbar-brand { font-weight: 700; letter-spacing: .01em; }
+        .navbar .dropdown-menu { max-height: 70vh; overflow-y: auto; }
+        main.container { min-height: 60vh; }
+        .table th { white-space: nowrap; }
+        .action-bar { gap: .75rem; }
+        @media (max-width: 991.98px) {
+            .navbar-nav { padding: .5rem 0; }
+            .navbar .dropdown-menu { border: 0; padding-left: 1rem; }
+            main.container { margin-inline: .75rem; width: auto; padding: 1rem !important; }
+            .action-bar { align-items: stretch !important; flex-direction: column; }
+            .action-bar .btn { width: 100%; }
+        }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100 bg-light">
+
+    <!-- Bara de navigare globală -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow-sm" aria-label="Navigație administrare">
+        <div class="container">
+            <a class="navbar-brand" href="/">Creator Hub · Admin</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#admin-navigation" aria-controls="admin-navigation" aria-expanded="false" aria-label="Deschide meniul">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="admin-navigation">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item"><a class="nav-link" href="/">Panou</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Conținut</a>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="/carti">Cărți</a></li>
+                            <li><a class="dropdown-item" href="/capitole">Capitole</a></li>
+                            <li><a class="dropdown-item" href="/categorii">Categorii</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Comunitate</a>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="/utilizatori">Utilizatori</a></li>
+                            <li><a class="dropdown-item" href="/recenzii">Recenzii</a></li>
+                            <li><a class="dropdown-item" href="/comentarii">Comentarii</a></li>
+                            <li><a class="dropdown-item" href="/rapoarte">Rapoarte</a></li>
+                            <li><a class="dropdown-item" href="/notificari">Notificări</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Financiar</a>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="/abonamente">Abonamente</a></li>
+                            <li><a class="dropdown-item" href="/evenimente">Evenimente</a></li>
+                            <li><a class="dropdown-item" href="/plati">Plăți</a></li>
+                            <li><a class="dropdown-item" href="/cereri-retragere">Retrageri</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/analitice/abonamente">Istoric abonamente</a></li>
+                            <li><a class="dropdown-item" href="/analitice/puncte">Flux puncte</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Sistem</a>
+                        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                            <li><a class="dropdown-item" href="/alerte">Alerte</a></li>
+                            <li><a class="dropdown-item" href="/setari">Setări</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container flex-grow-1 bg-white p-4 rounded shadow-sm border">
+        {% if request.query_params.get('success') %}
+            <div class="alert alert-success alert-dismissible fade show" role="status">
+                {{ request.query_params.get('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Închide"></button>
+            </div>
+        {% endif %}
+        {% if request.query_params.get('error') %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ request.query_params.get('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Închide"></button>
+            </div>
+        {% endif %}
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="bg-dark text-white text-center py-3 mt-auto">
+        <div class="container">
+            <small>&copy; 2026 Creator Hub · Panou de administrare demonstrativ</small>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

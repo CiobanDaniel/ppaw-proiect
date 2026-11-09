@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Panou administrare{% endblock %}
+
+{% block content %}
+<div class="text-center py-5">
+    <h1 class="mb-3 text-primary">Panou de administrare</h1>
+    <p class="lead text-muted mb-5">Alege un modul pentru gestionarea platformei demonstrative.</p>
+    
+    <div class="d-flex flex-wrap justify-content-center action-bar">
+        <a href="/utilizatori" class="btn btn-outline-primary btn-lg px-4">Modul Utilizatori</a>
+        <a href="/carti" class="btn btn-outline-success btn-lg px-4">Modul Cărți</a>
+        <a href="/categorii" class="btn btn-outline-warning btn-lg px-4">Modul Categorii</a>
+        <a href="/setari" class="btn btn-outline-secondary btn-lg px-4">Setări Sistem</a>
+        <a href="/alerte" class="btn btn-outline-danger btn-lg px-4">Alerte Sistem</a>
+        <a href="/capitole" class="btn btn-outline-success btn-lg px-4">Modul Capitole</a>
+        <a href="/recenzii" class="btn btn-outline-warning btn-lg px-4 text-dark">Moderare Recenzii</a>
+        <a href="/comentarii" class="btn btn-outline-info btn-lg px-4 text-dark">Moderare Comentarii</a>
+    </div>
+
+    <hr class="my-5">
+    <h3 class="text-muted mb-4">Economie & Finanțe</h3>
+    <div class="d-flex flex-wrap justify-content-center action-bar">
+        <a href="/abonamente" class="btn btn-outline-success btn-lg px-4">Pachete Abonament</a>
+        <a href="/evenimente" class="btn btn-outline-primary btn-lg px-4">Evenimente Promo</a>
+        <a href="/plati" class="btn btn-outline-dark btn-lg px-4">Istoric Plăți</a>
+        <a href="/cereri-retragere" class="btn btn-outline-danger btn-lg px-4">Cereri Retragere</a>
+    </div>
+
+    <hr class="my-5">
+    <h3 class="text-muted mb-4">Moderare & Suport</h3>
+    <div class="d-flex flex-wrap justify-content-center action-bar">
+        <a href="/rapoarte" class="btn btn-outline-danger btn-lg px-4">Rapoarte Conținut</a>
+        <a href="/notificari" class="btn btn-outline-info btn-lg px-4">Trimite Notificări</a>
+    </div>
+
+    <hr class="my-5">
+    <h3 class="text-muted mb-4">Analitice & Audit (Read-Only)</h3>
+    <div class="d-flex flex-wrap justify-content-center action-bar">
+        <a href="/analitice/abonamente" class="btn btn-outline-secondary btn-lg px-4">Istoric Abonamente</a>
+        <a href="/analitice/puncte" class="btn btn-outline-secondary btn-lg px-4">Flux Puncte</a>
+    </div>
+</div>
+{% endblock %}
