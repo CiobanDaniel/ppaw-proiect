@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Procesare Cerere Retragere{% endblock %}
+{% block content %}
+<h2 class="text-primary mb-4">Procesare Cerere Retragere</h2>
+
+<div class="card shadow-sm p-4 mb-4" style="max-width: 600px;">
+    <h5 class="card-title text-muted mb-3">Detalii Cerere #{{ cerere.id }}</h5>
+    <ul class="list-group list-group-flush mb-4">
+        <li class="list-group-item">Autor: <strong>{{ cerere.utilizatori.nume_utilizator if cerere.utilizatori else 'Necunoscut' }}</strong></li>
+        <li class="list-group-item">Suma de plată: <strong class="text-success">{{ cerere.suma }} RON</strong></li>
+        <li class="list-group-item">Data depunerii: {{ cerere.data_crearii.strftime('%d-%m-%Y %H:%M') if cerere.data_crearii else '-' }}</li>
+    </ul>
+
+    <form action="/cereri-retragere/procesare/{{ cerere.id }}" method="POST">
+        <div class="mb-3">
+            <label class="form-label fw-bold" for="admin">Administrator responsabil *</label>
+            <select id="admin" name="id_admin_procesare" class="form-select" required>
+                <option value="">-- Alege administratorul --</option>
+                {% for admin in admini %}
+                    <option value="{{ admin.id }}">{{ admin.nume_utilizator }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Decizie Administrare *</label>
+            <select name="stare" class="form-select border-primary" required>
+                <option value="">-- Alege o acțiune --</option>
+                <option value="aprobata">Aprobă (Banii au fost transferați)</option>
+                <option value="respinsa">Respinge (Cerere invalidă)</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="observatii">Observații interne</label>
+            <textarea id="observatii" name="observatii" class="form-control" rows="3" maxlength="1000"></textarea>
+        </div>
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary">Confirmă Decizia</button>
+            <a href="/cereri-retragere" class="btn btn-secondary ms-2">Anulează</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

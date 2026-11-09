@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Cereri Retragere Fonduri{% endblock %}
+{% block content %}
+<h2 class="text-primary mb-4">Cereri Retragere Autori</h2>
+
+<table class="table table-hover table-bordered align-middle shadow-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Autor</th>
+            <th>Suma Solicitată</th>
+            <th>Stare</th>
+            <th>Data Depunerii</th>
+            <th>Data Procesării</th>
+            <th>Procesată de</th>
+            <th class="text-center">Acțiuni</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for c in cereri %}
+        <tr>
+            <td>#{{ c.id }}</td>
+            <td class="fw-bold">{{ c.utilizatori.nume_utilizator if c.utilizatori else 'Autor Șters' }}</td>
+            <td class="text-primary fw-bold">{{ c.suma }} RON</td>
+            <td>
+                {% if c.stare == 'in_asteptare' %}
+                    <span class="badge bg-warning text-dark">În așteptare</span>
+                {% elif c.stare == 'aprobata' %}
+                    <span class="badge bg-success">Aprobată</span>
+                {% else %}
+                    <span class="badge bg-danger">Respinsă</span>
+                {% endif %}
+            </td>
+            <td><small>{{ c.data_crearii.strftime('%d-%m-%Y %H:%M') if c.data_crearii else '-' }}</small></td>
+            <td><small>{{ c.data_procesarii.strftime('%d-%m-%Y %H:%M') if c.data_procesarii else '-' }}</small></td>
+            <td>{{ c.admin_procesare.nume_utilizator if c.admin_procesare else '-' }}</td>
+            <td class="text-center">
+                {% if c.stare == 'in_asteptare' %}
+                    <a href="/cereri-retragere/procesare/{{ c.id }}" class="btn btn-sm btn-primary">Procesează</a>
+                {% else %}
+                    <button class="btn btn-sm btn-outline-secondary" disabled>Procesată</button>
+                {% endif %}
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="8" class="text-center text-muted py-4">Nu există cereri de retragere în așteptare sau procesate.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

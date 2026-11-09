@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Evenimente Promoționale{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="m-0 text-primary">Evenimente Promoționale</h2>
+    <a href="/evenimente/creare" class="btn btn-primary">Adaugă Eveniment</a>
+</div>
+<table class="table table-hover table-bordered align-middle shadow-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>Nume Eveniment</th>
+            <th>Bonus Puncte</th>
+            <th>Perioada</th>
+            <th>Stare</th>
+            <th class="text-center">Acțiuni</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for e in evenimente %}
+        <tr>
+            <td class="fw-bold">{{ e.nume }}</td>
+            <td class="text-success fw-bold">+{{ e.recompensa_puncte }} puncte</td>
+            <td><small>{{ e.data_inceput.strftime('%d-%m-%Y %H:%M') }}<br>până la<br>{{ e.data_sfarsit.strftime('%d-%m-%Y %H:%M') }}</small></td>
+            <td>
+                {% if e.este_activ %}
+                    <span class="badge bg-success">Activ</span>
+                {% else %}
+                    <span class="badge bg-secondary">Inactiv</span>
+                {% endif %}
+            </td>
+            <td class="text-center">
+                <a href="/evenimente/editare/{{ e.id }}" class="btn btn-sm btn-outline-primary">Modifică</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

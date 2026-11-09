@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Nivele Abonament{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="m-0 text-success">Management Abonamente (Tiers)</h2>
+    <a href="/abonamente/creare" class="btn btn-success">Adaugă Nivel</a>
+</div>
+<table class="table table-hover table-bordered align-middle shadow-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>Nume Pachet</th>
+            <th>Preț (RON)</th>
+            <th>Beneficii</th>
+            <th class="text-center">Acțiuni</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for a in nivele %}
+        <tr>
+            <td class="fw-bold">{{ a.nume }}</td>
+            <td class="text-success fw-bold">{{ a.pret_real }} RON</td>
+            <td><small>{{ a.descriere_beneficii }}</small></td>
+            <td class="text-center">
+                <a href="/abonamente/editare/{{ a.id }}" class="btn btn-sm btn-outline-primary">Editare</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

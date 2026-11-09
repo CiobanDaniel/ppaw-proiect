@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Confirmă rambursarea{% endblock %}
+{% block content %}
+<h2 class="text-danger mb-3">Confirmă rambursarea simulată</h2>
+<div class="alert alert-warning">Această acțiune schimbă plata în „rambursat” și poate anula abonamentul sau retrage punctele asociate. Operația nu poate fi refăcută.</div>
+<div class="card shadow-sm p-4" style="max-width: 680px;">
+    <dl class="row mb-4">
+        <dt class="col-sm-4">Plată</dt><dd class="col-sm-8">#{{ plata.id }} · {{ plata.suma_reala }} {{ plata.moneda }}</dd>
+        <dt class="col-sm-4">Utilizator</dt><dd class="col-sm-8">{{ plata.utilizatori.nume_utilizator if plata.utilizatori else 'Cont șters' }}</dd>
+        <dt class="col-sm-4">Scop</dt><dd class="col-sm-8">{{ plata.scop_plata }}</dd>
+    </dl>
+    {% if not admini %}
+        <div class="alert alert-danger mb-0">Nu există încă un utilizator cu rolul „admin”. Creează unul înainte de a procesa operația.</div>
+    {% else %}
+        <form action="/plati/rambursare/{{ plata.id }}" method="POST">
+            <div class="mb-3">
+                <label class="form-label fw-bold" for="admin">Administrator responsabil *</label>
+                <select id="admin" name="id_admin_rambursare" class="form-select" required>
+                    <option value="">-- Selectează administratorul --</option>
+                    {% for admin in admini %}<option value="{{ admin.id }}">{{ admin.nume_utilizator }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="form-label fw-bold" for="motiv">Motivul rambursării *</label>
+                <textarea id="motiv" name="motiv_rambursare" class="form-control" rows="3" maxlength="500" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-danger">Confirmă rambursarea</button>
+            <a href="/plati" class="btn btn-secondary ms-2">Renunță</a>
+        </form>
+    {% endif %}
+</div>
+{% endblock %}

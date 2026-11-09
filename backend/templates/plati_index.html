@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Istoric Plăți{% endblock %}
+{% block content %}
+<h2 class="text-success mb-4">Istoric Plăți Platformă</h2>
+<div class="alert alert-info">Aici poți audita plățile efectuate de utilizatori și poți procesa rambursări dacă este necesar.</div>
+
+<table class="table table-hover table-bordered align-middle shadow-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>ID Tranzacție</th>
+            <th>Utilizator</th>
+            <th>Suma</th>
+            <th>Scop</th>
+            <th>Stare</th>
+            <th>Data Creării</th>
+            <th class="text-center">Acțiuni</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in plati %}
+        <tr>
+            <td>#{{ p.id }}</td>
+            <td class="fw-bold">{{ p.utilizatori.nume_utilizator if p.utilizatori else 'Cont Șters' }}</td>
+            <td class="text-success fw-bold">{{ p.suma_reala }} {{ p.moneda }}</td>
+            <td>{{ p.scop_plata }}</td>
+            <td>
+                {% if p.stare == 'finalizat' %}
+                    <span class="badge bg-success">Finalizat</span>
+                {% elif p.stare == 'in_asteptare' %}
+                    <span class="badge bg-warning text-dark">În așteptare</span>
+                {% else %}
+                    <span class="badge bg-danger">{{ p.stare }}</span>
+                {% endif %}
+            </td>
+            <td><small>{{ p.data_crearii.strftime('%d-%m-%Y %H:%M') if p.data_crearii else '-' }}</small></td>
+            <td class="text-center">
+                {% if p.stare == 'finalizat' %}
+                    <a href="/plati/rambursare/{{ p.id }}" class="btn btn-sm btn-outline-danger">Rambursează</a>
+                {% else %}
+                    <button class="btn btn-sm btn-outline-secondary" disabled>Rambursată</button>
+                {% endif %}
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="7" class="text-center text-muted py-4">Nu există încă plăți înregistrate în mediul demonstrativ.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

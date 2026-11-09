@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Editare Eveniment{% endblock %}
+
+{% block content %}
+<h2 class="text-primary mb-4">Editare Eveniment Promoțional</h2>
+<form action="/evenimente/editare/{{ eveniment.id }}" method="POST" class="card shadow-sm p-4" style="max-width: 600px;">
+    <div class="mb-3">
+        <label class="form-label fw-bold">Nume Eveniment *</label>
+        <input type="text" name="nume" class="form-control" value="{{ eveniment.nume }}" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label fw-bold">Recompensă (Puncte)*</label>
+        <input type="number" name="recompensa_puncte" class="form-control" value="{{ eveniment.recompensa_puncte }}" min="0" required>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label class="form-label fw-bold">Data Începerii *</label>
+            <!-- Folosim strftime pentru a formata data exact cum o cere input-ul datetime-local (YYYY-MM-DDThh:mm) -->
+            <input type="datetime-local" name="data_inceput" class="form-control" value="{{ eveniment.data_inceput.strftime('%Y-%m-%dT%H:%M') }}" required>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label fw-bold">Data Sfârșitului *</label>
+            <input type="datetime-local" name="data_sfarsit" class="form-control" value="{{ eveniment.data_sfarsit.strftime('%Y-%m-%dT%H:%M') }}" required>
+        </div>
+    </div>
+    <div class="form-check form-switch mb-4">
+        <input class="form-check-input" type="checkbox" id="activCheck" name="este_activ" {% if eveniment.este_activ %}checked{% endif %}>
+        <label class="form-check-label fw-bold" for="activCheck">Activează evenimentul</label>
+    </div>
+    <div>
+        <button type="submit" class="btn btn-primary">Actualizează Evenimentul</button>
+        <a href="/evenimente" class="btn btn-secondary ms-2">Anulează</a>
+    </div>
+</form>
+{% endblock %}
