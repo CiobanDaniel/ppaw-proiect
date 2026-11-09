@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Editare Setare{% endblock %}
+{% block content %}
+<h2 class="text-primary mb-4">Modifică Setarea</h2>
+<form action="/setari/editare/{{ setare.id }}" method="POST" class="card shadow-sm p-4" style="max-width: 500px;">
+    <div class="mb-3">
+        <label class="form-label fw-bold">Numele Setării *</label>
+        <input type="text" name="nume_setare" class="form-control" value="{{ setare.nume_setare }}" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label fw-bold">Valoarea Setării *</label>
+        <input type="text" name="valoare_setare" class="form-control" value="{{ setare.valoare_setare }}" required>
+    </div>
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">Actualizează</button>
+        <a href="/setari" class="btn btn-outline-secondary ms-2">Anulează</a>
+    </div>
+</form>
+{% endblock %}

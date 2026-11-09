@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Creare Alertă{% endblock %}
+{% block content %}
+<h2 class="text-danger mb-4">Transmitere Alertă Nouă</h2>
+<form action="/alerte/creare" method="POST" class="card shadow-sm p-4" style="max-width: 500px;">
+    <div class="mb-3">
+        <label class="form-label fw-bold">Mesajul Alertei *</label>
+        <textarea name="mesaj" class="form-control" rows="3" required></textarea>
+    </div>
+    <div class="mb-3">
+        <label class="form-label fw-bold">Tip Alertă (Nivel importanță)</label>
+        <select name="tip_alerta" class="form-select">
+            <option value="info">Info (Informativ)</option>
+            <option value="success">Success (Pozitiv/Reușită)</option>
+            <option value="warning">Warning (Avertisment)</option>
+            <option value="danger">Danger (Critic/Eroare)</option>
+        </select>
+    </div>
+    <div class="mt-4">
+        <button type="submit" class="btn btn-danger">Publică Alerta</button>
+        <a href="/alerte" class="btn btn-outline-secondary ms-2">Anulează</a>
+    </div>
+</form>
+{% endblock %}

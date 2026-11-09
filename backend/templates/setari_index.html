@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Setări Platformă{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="m-0 text-secondary">Setări de Sistem</h2>
+    <a href="/setari/creare" class="btn btn-secondary">Adaugă Setare Nouă</a>
+</div>
+<table class="table table-hover table-bordered align-middle shadow-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Nume Setare</th>
+            <th>Valoare curentă</th>
+            <th>Ultima Actualizare</th>
+            <th class="text-center">Acțiuni</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for s in setari %}
+        <tr>
+            <td>{{ s.id }}</td>
+            <td class="fw-bold text-primary">{{ s.nume_setare }}</td>
+            <td><code class="text-dark bg-light px-2 py-1 rounded">{{ s.valoare_setare }}</code></td>
+            <td>{{ s.data_actualizarii.strftime('%d-%m-%Y %H:%M') if s.data_actualizarii else '-' }}</td>
+            <td class="text-center">
+                <a href="/setari/editare/{{ s.id }}" class="btn btn-sm btn-outline-primary">Modifică</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

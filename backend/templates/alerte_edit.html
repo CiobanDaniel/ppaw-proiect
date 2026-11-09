@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Editare Alertă{% endblock %}
+{% block content %}
+<h2 class="text-primary mb-4">Modifică Alerta</h2>
+<form action="/alerte/editare/{{ alerta.id }}" method="POST" class="card shadow-sm p-4" style="max-width: 500px;">
+    <div class="mb-3">
+        <label class="form-label fw-bold">Mesajul Alertei *</label>
+        <textarea name="mesaj" class="form-control" rows="3" required>{{ alerta.mesaj }}</textarea>
+    </div>
+    <div class="mb-3">
+        <label class="form-label fw-bold">Tip Alertă</label>
+        <select name="tip_alerta" class="form-select">
+            <option value="info" {% if alerta.tip_alerta == 'info' %}selected{% endif %}>Info</option>
+            <option value="success" {% if alerta.tip_alerta == 'success' %}selected{% endif %}>Success</option>
+            <option value="warning" {% if alerta.tip_alerta == 'warning' %}selected{% endif %}>Warning</option>
+            <option value="danger" {% if alerta.tip_alerta == 'danger' %}selected{% endif %}>Danger</option>
+        </select>
+    </div>
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">Actualizează</button>
+        <a href="/alerte" class="btn btn-outline-secondary ms-2">Anulează</a>
+    </div>
+</form>
+{% endblock %}
