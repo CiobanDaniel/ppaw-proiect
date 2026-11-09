@@ -3,18 +3,27 @@ from pathlib import Path
 from typing import Optional
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
-from fastapi import FastAPI, Request, Form, Depends, HTTPException
+from fastapi import FastAPI, Request, Form, Depends, HTTPException, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
 from datetime import date, datetime
+from typing import List
 try:  # Permite atât `uvicorn backend.main:app`, cât și rularea din directorul backend.
     from .crud import SessionLocal, UtilizatoriAccessor, CartiAccessor, CategoriiAccessor, SetariAccessor, AlerteAccessor, CapitoleAccessor, RecenziiAccessor, ComentariiAccessor, NiveleAccessor, EvenimenteAccessor, PlatiAccessor, CereriRetragereAccessor, RapoarteAccessor, NotificariAccessor, AnaliticeAccessor, AdminOperationError
 except ImportError:
     from crud import SessionLocal, UtilizatoriAccessor, CartiAccessor, CategoriiAccessor, SetariAccessor, AlerteAccessor, CapitoleAccessor, RecenziiAccessor, ComentariiAccessor, NiveleAccessor, EvenimenteAccessor, PlatiAccessor, CereriRetragereAccessor, RapoarteAccessor, NotificariAccessor, AnaliticeAccessor, AdminOperationError
 
 app = FastAPI()
+
+try:
+    from .api_router import api_router
+except ImportError:
+    from api_router import api_router
+
+app.include_router(api_router)
 
 BASE_DIR = Path(__file__).resolve().parent
 VALID_ROLES = {"cititor", "autor", "admin"}
