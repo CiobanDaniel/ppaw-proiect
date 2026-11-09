@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Detalii Carte{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Detalii Carte</h2>
+<div class="card shadow-sm" style="max-width: 600px;">
+    <div class="card-body">
+        <h5 class="card-title text-success">{{ carte.titlu }}</h5>
+        <hr>
+        <dl class="row mb-0">
+            <dt class="col-sm-4">Autor</dt>
+            <dd class="col-sm-8 fw-bold">{{ carte.utilizatori.nume_utilizator if carte.utilizatori else 'Fără Autor' }}</dd>
+            
+            <dt class="col-sm-4">Descriere</dt>
+            <dd class="col-sm-8">{{ carte.descriere or 'Nicio descriere adăugată.' }}</dd>
+            
+            <dt class="col-sm-4">Stare</dt>
+            <dd class="col-sm-8"><span class="badge bg-info text-dark">{{ carte.stare }}</span></dd>
+        </dl>
+    </div>
+    <div class="card-footer bg-light">
+        <a href="/carti/editare/{{ carte.id }}" class="btn btn-primary">Editare</a>
+        <a href="/carti" class="btn btn-secondary">Înapoi la listă</a>
+    </div>
+</div>
+{% endblock %}

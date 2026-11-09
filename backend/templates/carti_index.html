@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Lista Cărți{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="m-0">Lista Cărți</h2>
+    <a href="/carti/creare" class="btn btn-success">Adaugă Carte Nouă</a>
+</div>
+
+<table class="table table-hover table-bordered align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>Titlu</th>
+            <th>Autor</th>
+            <th>Stare</th>
+            <th class="text-center">Acțiuni</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for carte in carti %}
+        <tr>
+            <td class="fw-bold">{{ carte.titlu }}</td>
+            <td>{{ carte.utilizatori.nume_utilizator if carte.utilizatori else 'Fără Autor' }}</td>
+            <td><span class="badge bg-info text-dark">{{ carte.stare }}</span></td>
+            <td class="text-center">
+                <a href="/carti/detalii/{{ carte.id }}" class="btn btn-sm btn-outline-secondary">Detalii</a>
+                <a href="/carti/editare/{{ carte.id }}" class="btn btn-sm btn-outline-primary">Editare</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

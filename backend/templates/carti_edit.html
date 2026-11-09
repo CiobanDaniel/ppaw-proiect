@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Editare Carte{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Editare Carte: {{ carte.titlu }}</h2>
+<form action="/carti/editare/{{ carte.id }}" method="POST" class="card shadow-sm p-4" style="max-width: 600px;">
+    <div class="mb-3">
+        <label class="form-label fw-bold">Titlu *</label>
+        <input type="text" name="titlu" class="form-control" value="{{ carte.titlu }}" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label fw-bold">Nume Autor *</label>
+        <select name="id_autor" class="form-select" required>
+            {% for autor in autori %}
+                <option value="{{ autor.id }}" {% if autor.id == carte.id_autor %}selected{% endif %}>
+                    {{ autor.nume_utilizator }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Descriere</label>
+        <textarea name="descriere" class="form-control" rows="3">{{ carte.descriere }}</textarea>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Stare</label>
+        <input type="text" name="stare" class="form-control" value="{{ carte.stare }}">
+    </div>
+    
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">Actualizează</button>
+        <a href="/carti" class="btn btn-secondary ms-2">Anulează</a>
+    </div>
+</form>
+{% endblock %}
