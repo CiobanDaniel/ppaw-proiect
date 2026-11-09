@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Lista Utilizatori{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="m-0">Lista Utilizatori</h2>
+    <a href="/utilizatori/creare" class="btn btn-primary">Adaugă Utilizator Nou</a>
+</div>
+
+<table class="table table-hover table-bordered align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>Nume Utilizator</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th class="text-center">Acțiuni</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for utilizator in utilizatori %}
+        <tr>
+            <td class="fw-bold">{{ utilizator.nume_utilizator }}</td>
+            <td>{{ utilizator.email }}</td>
+            <td><span class="badge bg-secondary">{{ utilizator.rol }}</span></td>
+            <td class="text-center">
+                <a href="/utilizatori/detalii/{{ utilizator.id }}" class="btn btn-sm btn-outline-info">Detalii</a>
+                <a href="/utilizatori/editare/{{ utilizator.id }}" class="btn btn-sm btn-outline-primary">Editare</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

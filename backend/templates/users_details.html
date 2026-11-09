@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Detalii Utilizator{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Detalii Utilizator</h2>
+<div class="card shadow-sm" style="max-width: 600px;">
+    <div class="card-body">
+        <h5 class="card-title text-primary">{{ utilizator.nume_utilizator }}</h5>
+        <hr>
+        <dl class="row mb-0">
+            <dt class="col-sm-4">Email</dt>
+            <dd class="col-sm-8">{{ utilizator.email }}</dd>
+            
+            <dt class="col-sm-4">Rol</dt>
+            <dd class="col-sm-8">{{ utilizator.rol }}</dd>
+            
+            <dt class="col-sm-4">Telefon</dt>
+            <dd class="col-sm-8">{{ utilizator.telefon or '-' }}</dd>
+
+            <dt class="col-sm-4">Adresa</dt>
+            <dd class="col-sm-8">{{ utilizator.adresa or '-' }}</dd>
+
+            <dt class="col-sm-4">Data Nașterii</dt>
+            <dd class="col-sm-8">{{ utilizator.data_nasterii or '-' }}</dd>
+        </dl>
+    </div>
+    <div class="card-footer bg-light">
+        <a href="/utilizatori/editare/{{ utilizator.id }}" class="btn btn-primary">Editare</a>
+        <a href="/utilizatori" class="btn btn-secondary">Înapoi la listă</a>
+    </div>
+</div>
+{% endblock %}
