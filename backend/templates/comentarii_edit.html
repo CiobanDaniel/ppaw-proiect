@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Moderare Comentariu{% endblock %}
+{% block content %}
+<h2 class="text-info mb-4">Moderează Comentariul</h2>
+
+<div class="alert alert-secondary shadow-sm" style="max-width: 600px;">
+    <strong>Detalii context:</strong><br>
+    Scris de: <strong>{{ comentariu.utilizatori.nume_utilizator if comentariu.utilizatori else 'Necunoscut' }}</strong><br>
+    La capitolul: <strong>{{ comentariu.capitole.titlu if comentariu.capitole else 'Capitol șters' }}</strong>
+</div>
+
+<form action="/comentarii/editare/{{ comentariu.id }}" method="POST" class="card shadow-sm p-4" style="max-width: 600px;">
+    <div class="mb-3">
+        <label class="form-label fw-bold">Text Comentariu</label>
+        <textarea name="continut" class="form-control" rows="5" required>{{ comentariu.continut }}</textarea>
+        <div class="form-text">Ca administrator, poți edita limbajul inadecvat, șterge date personale etc.</div>
+    </div>
+    <div class="mt-4">
+        <button type="submit" class="btn btn-info text-white">Salvează Modificările</button>
+        <a href="/comentarii" class="btn btn-outline-secondary ms-2">Anulează</a>
+    </div>
+</form>
+{% endblock %}

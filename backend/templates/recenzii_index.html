@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Moderare Recenzii{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="m-0 text-warning">Moderare Recenzii</h2>
+</div>
+<table class="table table-hover table-bordered align-middle shadow-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>Utilizator</th>
+            <th>Carte</th>
+            <th>Nota</th>
+            <th>Text Recenzie</th>
+            <th>Data</th>
+            <th class="text-center">Acțiuni</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in recenzii %}
+        <tr>
+            <td class="fw-bold">{{ r.utilizatori.nume_utilizator if r.utilizatori else 'Necunoscut' }}</td>
+            <td class="text-primary">{{ r.carti.titlu if r.carti else 'Carte ștearsă' }}</td>
+            <td>
+                <!-- Afișăm nota vizual -->
+                <span class="badge {% if r.nota >= 4 %}bg-success{% elif r.nota == 3 %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                    {{ r.nota }} / 5
+                </span>
+            </td>
+            <td><small>{{ r.text_comentariu | truncate(50) }}</small></td>
+            <td><small>{{ r.data_crearii.strftime('%d-%m-%Y') if r.data_crearii else '-' }}</small></td>
+            <td class="text-center">
+                <a href="/recenzii/editare/{{ r.id }}" class="btn btn-sm btn-outline-warning text-dark">Moderează</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

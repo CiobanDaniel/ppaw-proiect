@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Moderare Comentarii{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="m-0 text-info">Moderare Comentarii Capitole</h2>
+</div>
+<table class="table table-hover table-bordered align-middle shadow-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>Utilizator</th>
+            <th>Capitol</th>
+            <th>Conținut Comentariu</th>
+            <th>Data</th>
+            <th class="text-center">Acțiuni</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for c in comentarii %}
+        <tr>
+            <td class="fw-bold">{{ c.utilizatori.nume_utilizator if c.utilizatori else 'Necunoscut' }}</td>
+            <td>
+                {% if c.capitole %}
+                    <span class="text-primary">{{ c.capitole.titlu }}</span>
+                    <br><small class="text-muted">({{ c.capitole.carti.titlu if c.capitole.carti else 'Carte ștearsă' }})</small>
+                {% else %}
+                    Capitol șters
+                {% endif %}
+            </td>
+            <td><small>{{ c.continut | truncate(60) }}</small></td>
+            <td><small>{{ c.data_crearii.strftime('%d-%m-%Y %H:%M') if c.data_crearii else '-' }}</small></td>
+            <td class="text-center">
+                <a href="/comentarii/editare/{{ c.id }}" class="btn btn-sm btn-outline-info text-dark">Moderează</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

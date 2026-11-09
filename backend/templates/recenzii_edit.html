@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Moderare Recenzie{% endblock %}
+{% block content %}
+<h2 class="text-warning mb-4">Moderează Recenzia</h2>
+
+<div class="alert alert-info shadow-sm" style="max-width: 600px;">
+    <strong>Detalii context:</strong><br>
+    Scrisă de: <strong>{{ recenzie.utilizatori.nume_utilizator if recenzie.utilizatori else 'Necunoscut' }}</strong><br>
+    Pentru cartea: <strong>{{ recenzie.carti.titlu if recenzie.carti else 'Carte ștearsă' }}</strong>
+</div>
+
+<form action="/recenzii/editare/{{ recenzie.id }}" method="POST" class="card shadow-sm p-4" style="max-width: 600px;">
+    <div class="mb-3">
+        <label class="form-label fw-bold">Nota acordată (1-5)</label>
+        <input type="number" name="nota" class="form-control" min="1" max="5" value="{{ recenzie.nota }}" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label fw-bold">Text Comentariu</label>
+        <textarea name="text_comentariu" class="form-control" rows="5" required>{{ recenzie.text_comentariu }}</textarea>
+        <div class="form-text">Ca administrator, poți edita limbajul inadecvat (ex: poți înlocui cu "[Cenzurat de admin]").</div>
+    </div>
+    <div class="mt-4">
+        <button type="submit" class="btn btn-warning">Salvează Modificările</button>
+        <a href="/recenzii" class="btn btn-outline-secondary ms-2">Anulează</a>
+    </div>
+</form>
+{% endblock %}
