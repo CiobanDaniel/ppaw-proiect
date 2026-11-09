@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Citire Capitol{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="m-0 text-dark">{{ capitol.titlu }}</h2>
+        <p class="text-muted m-0">Din cartea: <strong>{{ capitol.carti.titlu if capitol.carti else 'Fără carte' }}</strong> | Capitolul {{ capitol.numar_capitol }}</p>
+    </div>
+    <div>
+        <a href="/capitole/editare/{{ capitol.id }}" class="btn btn-outline-primary">Editează</a>
+        <a href="/capitole" class="btn btn-secondary">Înapoi</a>
+    </div>
+</div>
+<hr>
+<!-- white-space: pre-wrap păstrează formatarea liniilor noi din Textarea -->
+<div class="card shadow-sm p-4 bg-light" style="white-space: pre-wrap; font-size: 1.1rem; line-height: 1.6;">{{ capitol.continut }}</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Lista Capitole{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="m-0 text-success">Lista Capitolelor</h2>
+    <a href="/capitole/creare" class="btn btn-success">Adaugă Capitol</a>
+</div>
+<table class="table table-hover table-bordered align-middle shadow-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>Carte</th>
+            <th>Nr.</th>
+            <th>Titlu Capitol</th>
+            <th>Acces</th>
+            <th>Stare</th>
+            <th class="text-center">Acțiuni</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for c in capitole %}
+        <tr>
+            <td class="text-muted">{{ c.carti.titlu if c.carti else 'Fără carte' }}</td>
+            <td class="fw-bold">{{ c.numar_capitol }}</td>
+            <td class="fw-bold text-primary">{{ c.titlu }}</td>
+            <td>
+                {% if c.este_gratuit %}
+                    <span class="badge bg-success">Gratuit</span>
+                {% else %}
+                    <span class="badge bg-warning text-dark">{{ c.cost_puncte }} puncte</span>
+                {% endif %}
+            </td>
+            <td><span class="badge bg-secondary">{{ c.stare }}</span></td>
+            <td class="text-center">
+                <a href="/capitole/detalii/{{ c.id }}" class="btn btn-sm btn-outline-info">Citește</a>
+                <a href="/capitole/editare/{{ c.id }}" class="btn btn-sm btn-outline-primary">Editare</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

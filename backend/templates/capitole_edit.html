@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Editare Capitol{% endblock %}
+{% block content %}
+<h2 class="text-primary mb-4">Editare Capitol</h2>
+<form action="/capitole/editare/{{ capitol.id }}" method="POST" class="card shadow-sm p-4">
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Cartea *</label>
+            <select name="id_carte" class="form-select" required>
+                {% for carte in carti %}
+                    <option value="{{ carte.id }}" {% if carte.id == capitol.id_carte %}selected{% endif %}>
+                        {{ carte.titlu }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2 mb-3">
+            <label class="form-label fw-bold">Număr *</label>
+            <input type="number" name="numar_capitol" class="form-control" value="{{ capitol.numar_capitol }}" min="1" required>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label class="form-label fw-bold">Stare</label>
+            <select name="stare" class="form-select">
+                <option value="ciorna" {% if capitol.stare == 'ciorna' %}selected{% endif %}>Ciornă</option>
+                <option value="publicat" {% if capitol.stare == 'publicat' %}selected{% endif %}>Publicat</option>
+            </select>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label fw-bold">Titlu Capitol *</label>
+        <input type="text" name="titlu" class="form-control" value="{{ capitol.titlu }}" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label fw-bold">Conținut *</label>
+        <textarea name="continut" class="form-control" rows="10" required>{{ capitol.continut }}</textarea>
+    </div>
+    <div class="row bg-light p-3 border rounded mb-4 mx-0">
+        <div class="col-md-6 form-check form-switch mt-2">
+            <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" name="este_gratuit" {% if capitol.este_gratuit %}checked{% endif %}>
+            <label class="form-check-label fw-bold" for="flexSwitchCheckDefault">Capitol GRATUIT</label>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label fw-bold">Cost (Puncte)</label>
+            <input type="number" name="cost_puncte" class="form-control" value="{{ capitol.cost_puncte }}" min="0">
+        </div>
+    </div>
+    <div>
+        <button type="submit" class="btn btn-primary">Actualizează</button>
+        <a href="/capitole" class="btn btn-secondary ms-2">Anulează</a>
+    </div>
+</form>
+{% endblock %}
