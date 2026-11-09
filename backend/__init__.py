@@ -1,0 +1,1 @@
+"""Panoul administrativ Creator Hub."""

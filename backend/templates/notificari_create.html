@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Trimite Notificare{% endblock %}
+{% block content %}
+<h2 class="text-info mb-4">Trimite Notificare Directă</h2>
+<form action="/notificari/creare" method="POST" class="card shadow-sm p-4" style="max-width: 600px;">
+    <div class="mb-3">
+        <label class="form-label fw-bold">Destinatar (Utilizator) *</label>
+        <select name="id_utilizator" class="form-select" required>
+            <option value="">-- Alege un utilizator --</option>
+            {% for u in utilizatori %}
+                <option value="{{ u.id }}">{{ u.nume_utilizator }} ({{ u.email }})</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label fw-bold">Titlu Mesaj *</label>
+        <input type="text" name="titlu" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label fw-bold">Mesaj *</label>
+        <textarea name="mesaj" class="form-control" rows="5" required></textarea>
+    </div>
+    <div class="mt-4">
+        <button type="submit" class="btn btn-info text-white">Trimite Notificarea</button>
+        <a href="/notificari" class="btn btn-secondary ms-2">Anulează</a>
+    </div>
+</form>
+{% endblock %}

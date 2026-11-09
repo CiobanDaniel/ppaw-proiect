@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Istoric Subscripții{% endblock %}
+{% block content %}
+<h2 class="text-secondary mb-4">Istoric Subscripții Utilizatori</h2>
+<table class="table table-hover table-bordered align-middle shadow-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>Utilizator</th>
+            <th>Nivel</th>
+            <th>ID Plată Legată</th>
+            <th>Perioada</th>
+            <th>Stare</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for a in abonamente %}
+        <tr>
+            <td class="fw-bold">{{ a.utilizatori.nume_utilizator if a.utilizatori else 'Necunoscut' }}</td>
+            <td class="text-success">{{ a.nivele_abonament.nume if a.nivele_abonament else 'Șters' }}</td>
+            <td>{% if a.id_plata %}<a href="/plati">#{{ a.id_plata }}</a>{% else %}-{% endif %}</td>
+            <td><small>{{ a.data_inceput.strftime('%d-%m-%Y') }} - {{ a.data_sfarsit.strftime('%d-%m-%Y') }}</small></td>
+            <td>
+                {% if a.stare == 'activ' %}
+                    <span class="badge bg-success">Activ</span>
+                {% elif a.stare == 'anulat' %}
+                    <span class="badge bg-danger">Anulat</span>
+                {% else %}
+                    <span class="badge bg-secondary">{{ a.stare }}</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

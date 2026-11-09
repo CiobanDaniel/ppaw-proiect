@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Rapoarte Conținut{% endblock %}
+{% block content %}
+<h2 class="text-danger mb-4">Rapoarte de la Utilizatori</h2>
+<table class="table table-hover table-bordered align-middle shadow-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>Raportat De</th>
+            <th>Țintă</th>
+            <th>Motiv</th>
+            <th>Stare</th>
+            <th>Rezolvat De</th>
+            <th class="text-center">Acțiuni</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in rapoarte %}
+        <tr>
+            <td class="fw-bold">{{ r.utilizatori_.nume_utilizator if r.utilizatori_ else 'Cont Șters' }}</td>
+            <td><span class="badge bg-secondary">{{ r.tip_tinta }} #{{ r.id_tinta }}</span></td>
+            <td><small>{{ r.motiv | truncate(50) }}</small></td>
+            <td>
+                {% if r.stare == 'deschis' %}
+                    <span class="badge bg-danger">Deschis</span>
+                {% elif r.stare == 'rezolvat' %}
+                    <span class="badge bg-success">Rezolvat</span>
+                {% else %}
+                    <span class="badge bg-secondary">{{ r.stare }}</span>
+                {% endif %}
+            </td>
+            <td>{{ r.utilizatori.nume_utilizator if r.utilizatori else '-' }}</td>
+            <td class="text-center">
+                {% if r.stare == 'deschis' %}
+                    <a href="/rapoarte/rezolvare/{{ r.id }}" class="btn btn-sm btn-primary">Soluționează</a>
+                {% else %}
+                    <button class="btn btn-sm btn-outline-secondary" disabled>Închis</button>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Soluționare Raport{% endblock %}
+{% block content %}
+<h2 class="text-primary mb-4">Soluționare Raport #{{ raport.id }}</h2>
+
+<div class="card shadow-sm p-4 mb-4" style="max-width: 600px;">
+    <h5 class="card-title text-danger mb-3">Motivul Plângerii</h5>
+    <p class="card-text text-dark p-3 bg-light border rounded">{{ raport.motiv }}</p>
+    <ul class="list-group list-group-flush mb-4">
+        <li class="list-group-item">Raportat de: <strong>{{ raport.utilizatori_.nume_utilizator if raport.utilizatori_ else 'Necunoscut' }}</strong></li>
+        <li class="list-group-item">Tip Țintă: <strong>{{ raport.tip_tinta }}</strong> (ID: {{ raport.id_tinta }})</li>
+    </ul>
+
+    <form action="/rapoarte/rezolvare/{{ raport.id }}" method="POST">
+        <div class="mb-3">
+            <label class="form-label fw-bold">Selectează Adminul care rezolvă *</label>
+            <select name="id_admin_rezolvare" class="form-select" required>
+                <option value="">-- Alege contul tău de admin --</option>
+                {% for admin in admini %}
+                    <option value="{{ admin.id }}">{{ admin.nume_utilizator }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Decizie (Noua Stare) *</label>
+            <select name="stare" class="form-select border-primary" required>
+                <option value="rezolvat">Rezolvat (Acțiune luată asupra țintei)</option>
+                <option value="respins">Respins (Falsă alarmă)</option>
+            </select>
+        </div>
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary">Închide Raportul</button>
+            <a href="/rapoarte" class="btn btn-secondary ms-2">Anulează</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
