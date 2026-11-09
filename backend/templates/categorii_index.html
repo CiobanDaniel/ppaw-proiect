@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Categorii{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="m-0 text-primary">Management Categorii</h2>
+    <a href="/categorii/creare" class="btn btn-primary">Adaugă Categorie</a>
+</div>
+<table class="table table-hover table-bordered align-middle shadow-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Nume</th>
+            <th>Descriere</th>
+            <th class="text-center">Acțiuni</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for c in categorii %}
+        <tr>
+            <td>{{ c.id }}</td>
+            <td class="fw-bold">{{ c.nume }}</td>
+            <td>{{ c.descriere if c.descriere else '-' }}</td>
+            <td class="text-center">
+                <a href="/categorii/editare/{{ c.id }}" class="btn btn-sm btn-outline-primary">Editare</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
