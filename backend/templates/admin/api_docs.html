@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentație API · Creator Hub Admin</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css">
+    <style>body { margin: 0; } .api-nav { align-items: center; background: #212529; display: flex; gap: 1rem; justify-content: space-between; padding: .8rem 5%; } .api-nav a { color: white; font-family: system-ui, sans-serif; text-decoration: none; }</style>
+</head>
+<body>
+    <nav class="api-nav"><a href="/admin">← Panoul de administrare</a><a href="/">Platforma publică</a></nav>
+    <div id="swagger-ui"></div>
+    <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+    <script>SwaggerUIBundle({ url: '{{ openapi_url }}', dom_id: '#swagger-ui', deepLinking: true, presets: [SwaggerUIBundle.presets.apis, SwaggerUIBundle.SwaggerUIStandalonePreset], layout: 'BaseLayout' });</script>
+</body>
+</html>
