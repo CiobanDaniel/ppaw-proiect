@@ -53,7 +53,29 @@ Asigură-te că ai configurat conexiunea la baza de date (PostgreSQL) în mediul
 alembic upgrade head
 ```
 
-### 4. Pornirea aplicației
+### 4. Compilarea frontendului pentru producție
+
+Catalogul React nu este servit de Vite în timpul demonstrației. Instalează
+dependințele o singură dată și generează artefactele statice:
+
+```bash
+cd frontend
+npm ci
+npm run build
+cd ..
+```
+
+### 5. Crearea primului administrator
+
+Contul de administrator nu este introdus cu o parolă fixă în cod sau în
+migrări. Creează-l local după aplicarea migrărilor; comanda cere parola
+interactiv și o stochează derivată cu `scrypt` în baza de date:
+
+```bash
+.venv\Scripts\python.exe -m backend.create_admin admin admin@example.test
+```
+
+### 6. Pornirea aplicației
 
 Rulează serverul folosind uvicorn (aplicația rulează pe portul 8080):
 
@@ -61,11 +83,15 @@ Rulează serverul folosind uvicorn (aplicația rulează pe portul 8080):
 uvicorn backend.main:app --reload --port 8080
 ```
 
-## Ghid de Utilizare & Testare
+## Ghid de utilizare și testare
 
-* **Panoul Administrativ (MVC)**: Accesibil în browser la adresa http://127.0.0.1:8080 pentru administrarea vizuală a platformei.
+* **Platforma publică**: [http://127.0.0.1:8080/](http://127.0.0.1:8080/) afișează catalogul React și permite citirea capitolelor gratuite. Vizitatorii guest primesc o sesiune opacă, fără rând nou în `utilizatori`.
 
-* **Documentația API (Swagger)**: Pentru testarea endpoint-urilor API de tip GET, GET /{id}, POST și PUT, accesează documentația interactivă la http://127.0.0.1:8080/docs sau folosește un client precum Postman.
+* **Panoul administrativ (MVC)**: [http://127.0.0.1:8080/admin/login](http://127.0.0.1:8080/admin/login) cere un cont cu rolul `admin`; după autentificare, panoul este la [http://127.0.0.1:8080/admin](http://127.0.0.1:8080/admin).
+
+* **Frontend CRUD pentru laborator**: [http://127.0.0.1:8080/admin/categorii-api](http://127.0.0.1:8080/admin/categorii-api) consumă operațiile `GET`, `POST`, `PUT` și `DELETE` de la `/api/categorii`. Operațiile care modifică datele cer sesiunea administratorului.
+
+* **Documentația API (Swagger)**: [http://127.0.0.1:8080/docs](http://127.0.0.1:8080/docs) documentează API-ul. Nu este nevoie de DNS pentru rularea locală; pentru publicare, un reverse proxy poate direcționa domeniul către același proces FastAPI, fără a expune porturi diferite pentru frontend și API.
 
 ## Structura Proiectului
 
@@ -78,8 +104,8 @@ PPAW/
 │   ├── crud.py           # Accesori și logică de business / baza de date
 │   ├── main.py           # Punctul de intrare în aplicație și rutele MVC
 │   └── models.py         # Modelele SQLAlchemy
-├── frontend/             # Prototip React (opțional/separat)
-├── templates/            # Fișierele HTML (Jinja2) pentru panoul de admin
+├── frontend/             # Catalog React și interfața CRUD pentru API
+├── backend/templates/    # Fișierele HTML (Jinja2) pentru panoul de admin
 ├── alembic.ini           # Configurare Alembic
 ├── requirements.txt      # Dependențe Python
 └── README.md             # Documentația proiectului
