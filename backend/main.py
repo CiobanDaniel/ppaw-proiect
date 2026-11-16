@@ -282,13 +282,13 @@ def edit_post(
 @app.get("/carti")
 def carti_index(request: Request, accessor: CartiAccessor = Depends(get_carti_accessor)):
     carti = accessor.get_all_carti()
-    return templates.TemplateResponse(request=request, name="carti_index.html", context={"carti": carti})
+    return templates.TemplateResponse(request=request, name="admin/books/index.html", context={"carti": carti})
 
 @app.get("/carti/creare")
 def carti_create_get(request: Request, accessor: CartiAccessor = Depends(get_carti_accessor)):
     # Trimitem lista de autori către View pentru a popula dropdown-ul
     autori = accessor.get_autori_pentru_dropdown()
-    return templates.TemplateResponse(request=request, name="carti_create.html", context={"autori": autori})
+    return templates.TemplateResponse(request=request, name="admin/books/create.html", context={"autori": autori})
 
 @app.post("/carti/creare")
 def carti_create_post(
@@ -305,13 +305,13 @@ def carti_create_post(
 @app.get("/carti/detalii/{carte_id}")
 def carti_details(request: Request, carte_id: int, accessor: CartiAccessor = Depends(get_carti_accessor)):
     carte = get_or_404(accessor.get_carte_by_id(carte_id), "Cartea")
-    return templates.TemplateResponse(request=request, name="carti_details.html", context={"carte": carte})
+    return templates.TemplateResponse(request=request, name="admin/books/details.html", context={"carte": carte})
 
 @app.get("/carti/editare/{carte_id}")
 def carti_edit_get(request: Request, carte_id: int, accessor: CartiAccessor = Depends(get_carti_accessor)):
     carte = get_or_404(accessor.get_carte_by_id(carte_id), "Cartea")
     autori = accessor.get_autori_pentru_dropdown()
-    return templates.TemplateResponse(request=request, name="carti_edit.html", context={"carte": carte, "autori": autori})
+    return templates.TemplateResponse(request=request, name="admin/books/edit.html", context={"carte": carte, "autori": autori})
 
 @app.post("/carti/editare/{carte_id}")
 def carti_edit_post(
