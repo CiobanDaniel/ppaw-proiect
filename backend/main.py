@@ -729,9 +729,9 @@ def notificari_creare_post(
 @app.get("/analitice/abonamente")
 def analitice_abonamente(request: Request, accessor: AnaliticeAccessor = Depends(get_analitice_accessor)):
     abonamente = accessor.get_istoric_abonamente()
-    return templates.TemplateResponse(request=request, name="analitice_abonamente.html", context={"abonamente": abonamente})
+    return templates.TemplateResponse(request=request, name="admin/analytics/subscriptions.html", context={"abonamente": abonamente})
 
 @app.get("/analitice/puncte")
 def analitice_puncte(request: Request, accessor: AnaliticeAccessor = Depends(get_analitice_accessor)):
     tranzactii = accessor.get_tranzactii_puncte()
-    return templates.TemplateResponse(request=request, name="analitice_puncte.html", context={"tranzactii": tranzactii})
+    return templates.TemplateResponse(request=request, name="admin/analytics/points.html", context={"tranzactii": tranzactii})
