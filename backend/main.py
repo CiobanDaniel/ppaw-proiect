@@ -582,11 +582,11 @@ def abonamente_edit_post(
 @app.get("/evenimente")
 def evenimente_index(request: Request, accessor: EvenimenteAccessor = Depends(get_evenimente_accessor)):
     evenimente = accessor.get_toate_evenimentele()
-    return templates.TemplateResponse(request=request, name="evenimente_index.html", context={"evenimente": evenimente})
+    return templates.TemplateResponse(request=request, name="admin/events/index.html", context={"evenimente": evenimente})
 
 @app.get("/evenimente/creare")
 def evenimente_create_get(request: Request):
-    return templates.TemplateResponse(request=request, name="evenimente_create.html", context={"request": request})
+    return templates.TemplateResponse(request=request, name="admin/events/create.html", context={"request": request})
 
 @app.post("/evenimente/creare")
 def evenimente_create_post(
@@ -611,7 +611,7 @@ def evenimente_create_post(
 @app.get("/evenimente/editare/{ev_id}")
 def evenimente_edit_get(request: Request, ev_id: int, accessor: EvenimenteAccessor = Depends(get_evenimente_accessor)):
     eveniment = get_or_404(accessor.get_eveniment_by_id(ev_id), "Evenimentul")
-    return templates.TemplateResponse(request=request, name="evenimente_edit.html", context={"eveniment": eveniment})
+    return templates.TemplateResponse(request=request, name="admin/events/edit.html", context={"eveniment": eveniment})
 
 @app.post("/evenimente/editare/{ev_id}")
 def evenimente_edit_post(
