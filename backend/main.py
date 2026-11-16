@@ -500,12 +500,12 @@ def capitole_edit_post(
 @app.get("/recenzii")
 def recenzii_index(request: Request, accessor: RecenziiAccessor = Depends(get_recenzii_accessor)):
     recenzii = accessor.get_toate_recenziile()
-    return templates.TemplateResponse(request=request, name="recenzii_index.html", context={"recenzii": recenzii})
+    return templates.TemplateResponse(request=request, name="admin/reviews/index.html", context={"recenzii": recenzii})
 
 @app.get("/recenzii/editare/{rec_id}")
 def recenzii_edit_get(request: Request, rec_id: int, accessor: RecenziiAccessor = Depends(get_recenzii_accessor)):
     recenzie = get_or_404(accessor.get_recenzie_by_id(rec_id), "Recenzia")
-    return templates.TemplateResponse(request=request, name="recenzii_edit.html", context={"recenzie": recenzie})
+    return templates.TemplateResponse(request=request, name="admin/reviews/edit.html", context={"recenzie": recenzie})
 
 @app.post("/recenzii/editare/{rec_id}")
 def recenzii_edit_post(
