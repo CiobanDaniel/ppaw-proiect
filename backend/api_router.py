@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import List, Literal, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
@@ -10,10 +11,12 @@ try:
     from .crud import CategoriiAccessor # sau alte entități dorite
     from .access_sessions import ACCESS_COOKIE_NAME, AccessSessionService, set_access_cookie
     from .api_dependencies import get_db
+    from .admin_dependencies import require_admin_api
 except ImportError:
     from crud import CategoriiAccessor
     from access_sessions import ACCESS_COOKIE_NAME, AccessSessionService, set_access_cookie
     from api_dependencies import get_db
+    from admin_dependencies import require_admin_api
 
 api_router = APIRouter(prefix="/api", tags=["API Lab 7"])
 
@@ -35,6 +38,13 @@ class SesiuneAccesResponseSchema(BaseModel):
     tip_sesiune: Literal['guest', 'autentificata']
     autentificat: bool
     expira_la: Optional[datetime] = None
+
+
+def normalized_category_name(value: str) -> str:
+    value = value.strip()
+    if not value:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail='Numele categoriei este obligatoriu.')
+    return value
 
 
 @api_router.get('/sesiune', response_model=SesiuneAccesResponseSchema)
@@ -69,15 +79,46 @@ def get_categorie_id_api(cat_id: int, db: Session = Depends(get_db)):
 
 # --- EXERCIȚIUL 3: Endpoint-uri POST și PUT (preiau date din Body) ---
 @api_router.post("/categorii", response_model=CategorieResponseSchema, status_code=status.HTTP_201_CREATED)
-def create_categorie_api(payload: CategorieCreateUpdateSchema, db: Session = Depends(get_db)):
+def create_categorie_api(
+    payload: CategorieCreateUpdateSchema,
+    db: Session = Depends(get_db),
+    _administrator=Depends(require_admin_api),
+):
     accessor = CategoriiAccessor(db)
-    noua_cat = accessor.add_categorie(nume=payload.nume, descriere=payload.descriere)
+    try:
+        noua_cat = accessor.add_categorie(nume=normalized_category_name(payload.nume), descriere=payload.descriere)
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail='Există deja o categorie cu acest nume.') from exc
     return noua_cat
 
 @api_router.put("/categorii/{cat_id}", response_model=CategorieResponseSchema)
-def update_categorie_api(cat_id: int, payload: CategorieCreateUpdateSchema, db: Session = Depends(get_db)):
+def update_categorie_api(
+    cat_id: int,
+    payload: CategorieCreateUpdateSchema,
+    db: Session = Depends(get_db),
+    _administrator=Depends(require_admin_api),
+):
     accessor = CategoriiAccessor(db)
-    actualizata = accessor.update_categorie(cat_id=cat_id, nume=payload.nume, descriere=payload.descriere)
+    try:
+        actualizata = accessor.update_categorie(cat_id=cat_id, nume=normalized_category_name(payload.nume), descriere=payload.descriere)
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail='Există deja o categorie cu acest nume.') from exc
     if not actualizata:
         raise HTTPException(status_code=404, detail="Categoria nu a fost găsită.")
     return actualizata
+
+
+@api_router.delete("/categorii/{cat_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_categorie_api(
+    cat_id: int,
+    db: Session = Depends(get_db),
+    _administrator=Depends(require_admin_api),
+):
+    accessor = CategoriiAccessor(db)
+    categorie = accessor.get_categorie_by_id(cat_id)
+    if not categorie:
+        raise HTTPException(status_code=404, detail="Categoria nu a fost găsită.")
+    db.delete(categorie)
+    db.commit()
