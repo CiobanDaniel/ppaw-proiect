@@ -708,12 +708,12 @@ def rapoarte_rezolvare_post(
 @app.get("/notificari")
 def notificari_index(request: Request, accessor: NotificariAccessor = Depends(get_notificari_accessor)):
     notificari = accessor.get_toate_notificarile()
-    return templates.TemplateResponse(request=request, name="notificari_index.html", context={"notificari": notificari})
+    return templates.TemplateResponse(request=request, name="admin/notifications/index.html", context={"notificari": notificari})
 
 @app.get("/notificari/creare")
 def notificari_creare_get(request: Request, accessor: NotificariAccessor = Depends(get_notificari_accessor)):
     utilizatori = accessor.get_utilizatori()
-    return templates.TemplateResponse(request=request, name="notificari_create.html", context={"utilizatori": utilizatori})
+    return templates.TemplateResponse(request=request, name="admin/notifications/create.html", context={"utilizatori": utilizatori})
 
 @app.post("/notificari/creare")
 def notificari_creare_post(
