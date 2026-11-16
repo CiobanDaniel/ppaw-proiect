@@ -1,15 +1,20 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from datetime import datetime
+from typing import List, Literal, Optional
+
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.orm import Session
-from typing import List, Optional
 from pydantic import BaseModel
 
 # Importă SessionLocal și accessors din crud
 try:
     from .crud import SessionLocal, CategoriiAccessor # sau alte entități dorite
+    from .access_sessions import AccessSessionService, GUEST_SESSION_DAYS
 except ImportError:
     from crud import SessionLocal, CategoriiAccessor
+    from access_sessions import AccessSessionService, GUEST_SESSION_DAYS
 
 api_router = APIRouter(prefix="/api", tags=["API Lab 7"])
+ACCESS_COOKIE_NAME = "ppaw_access"
 
 # Dependență pentru sesiune de BDD în API
 def get_db():
@@ -31,6 +36,34 @@ class CategorieResponseSchema(BaseModel):
 
     class Config:
         from_attributes = True  # Asigură maparea automată din obiectele SQLAlchemy (ORM)
+
+
+class SesiuneAccesResponseSchema(BaseModel):
+    tip_sesiune: Literal['guest', 'autentificata']
+    autentificat: bool
+    expira_la: Optional[datetime] = None
+
+
+@api_router.get('/sesiune', response_model=SesiuneAccesResponseSchema)
+def get_sau_creeaza_sesiune(request: Request, response: Response, db: Session = Depends(get_db)):
+    """Asigură o sesiune guest fără a crea un cont de utilizator."""
+    result = AccessSessionService(db).get_or_create_guest_session(request.cookies.get(ACCESS_COOKIE_NAME))
+    session = result.session
+    if result.token_to_set:
+        response.set_cookie(
+            key=ACCESS_COOKIE_NAME,
+            value=result.token_to_set,
+            max_age=GUEST_SESSION_DAYS * 24 * 60 * 60,
+            httponly=True,
+            samesite='lax',
+            secure=False,
+        )
+    autentificat = session.id_utilizator is not None
+    return SesiuneAccesResponseSchema(
+        tip_sesiune='autentificata' if autentificat else 'guest',
+        autentificat=autentificat,
+        expira_la=session.expira_la,
+    )
 
 
 # --- EXERCIȚIUL 1: Endpoint-uri GET și GET(int id) ---
