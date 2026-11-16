@@ -5,7 +5,8 @@ from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from fastapi import FastAPI, Request, Form, Depends, HTTPException, status
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import RedirectResponse
+from fastapi.responses import FileResponse, PlainTextResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -15,6 +16,15 @@ try:  # Permite atât `uvicorn backend.main:app`, cât și rularea din directoru
     from .crud import SessionLocal, UtilizatoriAccessor, CartiAccessor, CategoriiAccessor, SetariAccessor, AlerteAccessor, CapitoleAccessor, RecenziiAccessor, ComentariiAccessor, NiveleAccessor, EvenimenteAccessor, PlatiAccessor, CereriRetragereAccessor, RapoarteAccessor, NotificariAccessor, AnaliticeAccessor, AdminOperationError
 except ImportError:
     from crud import SessionLocal, UtilizatoriAccessor, CartiAccessor, CategoriiAccessor, SetariAccessor, AlerteAccessor, CapitoleAccessor, RecenziiAccessor, ComentariiAccessor, NiveleAccessor, EvenimenteAccessor, PlatiAccessor, CereriRetragereAccessor, RapoarteAccessor, NotificariAccessor, AnaliticeAccessor, AdminOperationError
+
+try:
+    from .access_sessions import ACCESS_COOKIE_NAME, AccessSessionService, clear_access_cookie, set_access_cookie
+    from .authentication import authenticate_admin
+    from .models import Utilizatori
+except ImportError:
+    from access_sessions import ACCESS_COOKIE_NAME, AccessSessionService, clear_access_cookie, set_access_cookie
+    from authentication import authenticate_admin
+    from models import Utilizatori
 
 app = FastAPI()
 
@@ -29,6 +39,14 @@ app.include_router(api_router)
 app.include_router(public_catalog_router)
 
 BASE_DIR = Path(__file__).resolve().parent
+PROJECT_DIR = BASE_DIR.parent
+FRONTEND_DIST_DIR = PROJECT_DIR / "frontend" / "dist"
+ADMIN_PREFIX = "/admin"
+ADMIN_LEGACY_PREFIXES = (
+    "/utilizatori", "/carti", "/categorii", "/setari", "/alerte", "/capitole",
+    "/recenzii", "/comentarii", "/abonamente", "/evenimente", "/plati",
+    "/cereri-retragere", "/rapoarte", "/notificari", "/analitice",
+)
 VALID_ROLES = {"cititor", "autor", "admin"}
 VALID_BOOK_STATES = {"ciorna", "publicat"}
 VALID_ALERT_TYPES = {"info", "success", "warning", "danger"}
@@ -41,6 +59,8 @@ class AdminValidationError(Exception):
 
 
 def redirect_with_feedback(url: str, key: str, message: str) -> RedirectResponse:
+    if url.startswith("/") and not url.startswith(ADMIN_PREFIX):
+        url = f"{ADMIN_PREFIX}{url}"
     separator = "&" if "?" in url else "?"
     return RedirectResponse(url=f"{url}{separator}{urlencode({key: message})}", status_code=303)
 
@@ -54,7 +74,7 @@ def return_to_form(request: Request, key: str, message: str) -> RedirectResponse
             query = dict(parse_qsl(parts.query, keep_blank_values=True))
             query[key] = message
             return RedirectResponse(urlunsplit(("", "", parts.path, urlencode(query), "")), status_code=303)
-    return redirect_with_feedback("/", key, message)
+    return redirect_with_feedback(ADMIN_PREFIX, key, message)
 
 
 def require_choice(value: str, allowed: set[str], label: str) -> str:
@@ -109,6 +129,52 @@ async def request_validation_error(request: Request, exc: RequestValidationError
     return return_to_form(request, "error", "Datele formularului sunt incomplete sau au un format invalid.")
 
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+
+
+def safe_admin_next(value: str | None) -> str:
+    if value and value.startswith(ADMIN_PREFIX) and not value.startswith("//"):
+        return value
+    return ADMIN_PREFIX
+
+
+@app.middleware("http")
+async def protejeaza_si_prefixeaza_admin(request: Request, call_next):
+    """Expune MVC-ul numai sub /admin și cere o sesiune de administrator."""
+    path = request.url.path
+
+    if path in ADMIN_LEGACY_PREFIXES or any(path.startswith(f"{prefix}/") for prefix in ADMIN_LEGACY_PREFIXES):
+        query = f"?{request.url.query}" if request.url.query else ""
+        status_code = 303 if request.method in {"GET", "HEAD"} else 307
+        return RedirectResponse(f"{ADMIN_PREFIX}{path}{query}", status_code=status_code)
+
+    if not path.startswith(ADMIN_PREFIX):
+        return await call_next(request)
+
+    if path in {f"{ADMIN_PREFIX}/login", f"{ADMIN_PREFIX}/logout"}:
+        return await call_next(request)
+
+    db = SessionLocal()
+    try:
+        sesiune = AccessSessionService(db).get_active_session(request.cookies.get(ACCESS_COOKIE_NAME))
+        administrator = None
+        if sesiune and sesiune.id_utilizator:
+            administrator = db.query(Utilizatori).filter(
+                Utilizatori.id == sesiune.id_utilizator,
+                Utilizatori.rol == "admin",
+            ).first()
+        if not administrator:
+            return RedirectResponse(
+                f"{ADMIN_PREFIX}/login?next={ADMIN_PREFIX}{path[len(ADMIN_PREFIX):]}",
+                status_code=303,
+            )
+    finally:
+        db.close()
+
+    # Rutele MVC existente rămân interne; la exterior ele există doar sub /admin.
+    request.scope["path"] = path[len(ADMIN_PREFIX):] or "/"
+    request.scope["raw_path"] = request.scope["path"].encode("utf-8")
+    request.state.is_admin_route = True
+    return await call_next(request)
 
 
 @app.exception_handler(HTTPException)
@@ -218,8 +284,63 @@ def get_notificari_accessor():
     finally:
         db.close()
 
+@app.get(f"{ADMIN_PREFIX}/login")
+def admin_login_get(request: Request, next: Optional[str] = None):
+    return templates.TemplateResponse(
+        request=request,
+        name="admin/login.html",
+        context={"next": safe_admin_next(next)},
+    )
+
+
+@app.post(f"{ADMIN_PREFIX}/login")
+def admin_login_post(
+    request: Request,
+    identificator: str = Form(...),
+    parola: str = Form(...),
+    next: Optional[str] = Form(None),
+):
+    db = SessionLocal()
+    try:
+        administrator = authenticate_admin(db, identificator, parola)
+        if not administrator:
+            return RedirectResponse(
+                f"{ADMIN_PREFIX}/login?error=Date+de+autentificare+invalide.",
+                status_code=303,
+            )
+        rezultat = AccessSessionService(db).get_or_create_guest_session(request.cookies.get(ACCESS_COOKIE_NAME))
+        AccessSessionService(db).associate_user(rezultat.session, administrator.id)
+    finally:
+        db.close()
+
+    response = RedirectResponse(safe_admin_next(next), status_code=303)
+    if rezultat.token_to_set:
+        set_access_cookie(response, rezultat.token_to_set)
+    return response
+
+
+@app.post(f"{ADMIN_PREFIX}/logout")
+def admin_logout(request: Request):
+    db = SessionLocal()
+    try:
+        AccessSessionService(db).revoke_session(request.cookies.get(ACCESS_COOKIE_NAME))
+    finally:
+        db.close()
+    response = RedirectResponse("/", status_code=303)
+    clear_access_cookie(response)
+    return response
+
+
 @app.get("/")
 def home(request: Request):
+    if not getattr(request.state, "is_admin_route", False):
+        index_file = FRONTEND_DIST_DIR / "index.html"
+        if not index_file.exists():
+            return PlainTextResponse(
+                "Frontendul nu este compilat. Rulează `npm run build` în directorul frontend.",
+                status_code=503,
+            )
+        return FileResponse(index_file)
     return templates.TemplateResponse(
         request=request, 
         name="admin/dashboard/home.html",
@@ -738,3 +859,19 @@ def analitice_abonamente(request: Request, accessor: AnaliticeAccessor = Depends
 def analitice_puncte(request: Request, accessor: AnaliticeAccessor = Depends(get_analitice_accessor)):
     tranzactii = accessor.get_tranzactii_puncte()
     return templates.TemplateResponse(request=request, name="admin/analytics/points.html", context={"tranzactii": tranzactii})
+
+
+# Artefactele Vite sunt servite de același proces FastAPI în modul de producție,
+# deci catalogul și API-ul folosesc aceeași origine și nu depind de serverul Vite.
+app.mount("/assets", StaticFiles(directory=str(FRONTEND_DIST_DIR / "assets"), check_dir=False), name="frontend-assets")
+
+
+@app.get("/{frontend_path:path}", include_in_schema=False)
+def frontend_fallback():
+    index_file = FRONTEND_DIST_DIR / "index.html"
+    if not index_file.exists():
+        return PlainTextResponse(
+            "Frontendul nu este compilat. Rulează `npm run build` în directorul frontend.",
+            status_code=503,
+        )
+    return FileResponse(index_file)
