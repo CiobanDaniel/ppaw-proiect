@@ -399,11 +399,11 @@ def setari_edit_post(
 @app.get("/alerte")
 def alerte_index(request: Request, accessor: AlerteAccessor = Depends(get_alerte_accessor)):
     alerte = accessor.get_toate_alertele()
-    return templates.TemplateResponse(request=request, name="alerte_index.html", context={"alerte": alerte})
+    return templates.TemplateResponse(request=request, name="admin/alerts/index.html", context={"alerte": alerte})
 
 @app.get("/alerte/creare")
 def alerte_create_get(request: Request):
-    return templates.TemplateResponse(request=request, name="alerte_create.html", context={"request": request})
+    return templates.TemplateResponse(request=request, name="admin/alerts/create.html", context={"request": request})
 
 @app.post("/alerte/creare")
 def alerte_create_post(
@@ -418,7 +418,7 @@ def alerte_create_post(
 @app.get("/alerte/editare/{alerta_id}")
 def alerte_edit_get(request: Request, alerta_id: int, accessor: AlerteAccessor = Depends(get_alerte_accessor)):
     alerta = get_or_404(accessor.get_alerta_by_id(alerta_id), "Alerta")
-    return templates.TemplateResponse(request=request, name="alerte_edit.html", context={"alerta": alerta})
+    return templates.TemplateResponse(request=request, name="admin/alerts/edit.html", context={"alerta": alerta})
 
 @app.post("/alerte/editare/{alerta_id}")
 def alerte_edit_post(
