@@ -329,11 +329,11 @@ def carti_edit_post(
 @app.get("/categorii")
 def categorii_index(request: Request, accessor: CategoriiAccessor = Depends(get_categorii_accessor)):
     categorii = accessor.get_toate_categoriile()
-    return templates.TemplateResponse(request=request, name="categorii_index.html", context={"categorii": categorii})
+    return templates.TemplateResponse(request=request, name="admin/categories/index.html", context={"categorii": categorii})
 
 @app.get("/categorii/creare")
 def categorii_create_get(request: Request):
-    return templates.TemplateResponse(request=request, name="categorii_create.html", context={"request": request})
+    return templates.TemplateResponse(request=request, name="admin/categories/create.html", context={"request": request})
 
 @app.post("/categorii/creare")
 def categorii_create_post(
@@ -348,7 +348,7 @@ def categorii_create_post(
 @app.get("/categorii/editare/{cat_id}")
 def categorii_edit_get(request: Request, cat_id: int, accessor: CategoriiAccessor = Depends(get_categorii_accessor)):
     categorie = get_or_404(accessor.get_categorie_by_id(cat_id), "Categoria")
-    return templates.TemplateResponse(request=request, name="categorii_edit.html", context={"categorie": categorie})
+    return templates.TemplateResponse(request=request, name="admin/categories/edit.html", context={"categorie": categorie})
 
 @app.post("/categorii/editare/{cat_id}")
 def categorii_edit_post(
