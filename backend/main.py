@@ -660,14 +660,14 @@ def plati_rambursare_post(
 @app.get("/cereri-retragere")
 def cereri_index(request: Request, accessor: CereriRetragereAccessor = Depends(get_cereri_accessor)):
     cereri = accessor.get_toate_cererile()
-    return templates.TemplateResponse(request=request, name="cereri_index.html", context={"cereri": cereri})
+    return templates.TemplateResponse(request=request, name="admin/withdrawals/index.html", context={"cereri": cereri})
 
 @app.get("/cereri-retragere/procesare/{cerere_id}")
 def cereri_procesare_get(request: Request, cerere_id: int, accessor: CereriRetragereAccessor = Depends(get_cereri_accessor)):
     cerere = get_or_404(accessor.get_cerere_by_id(cerere_id), "Cererea de retragere")
     if cerere.stare != "in_asteptare":
         raise AdminValidationError("Această cerere a fost deja procesată.")
-    return templates.TemplateResponse(request=request, name="cereri_procesare.html", context={"cerere": cerere, "admini": accessor.get_admini()})
+    return templates.TemplateResponse(request=request, name="admin/withdrawals/process.html", context={"cerere": cerere, "admini": accessor.get_admini()})
 
 @app.post("/cereri-retragere/procesare/{cerere_id}")
 def cereri_procesare_post(
