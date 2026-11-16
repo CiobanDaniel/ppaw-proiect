@@ -61,6 +61,34 @@ class AccessSessionService:
         self.db.refresh(session)
         return AccessSessionResult(session=session, token_to_set=token)
 
+    def get_active_session(self, raw_token: str | None) -> SesiuniAcces | None:
+        """Returnează sesiunea validă fără a crea una nouă."""
+        if not raw_token:
+            return None
+        session = self.db.query(SesiuniAcces).filter(
+            SesiuniAcces.token_hash == self._hash_token(raw_token)
+        ).first()
+        if not session or not self._is_active(session, datetime.now(UTC)):
+            return None
+        session.data_ultima_activitate = datetime.now(UTC)
+        self.db.commit()
+        self.db.refresh(session)
+        return session
+
+    def associate_user(self, session: SesiuniAcces, user_id: int) -> SesiuniAcces:
+        """Transformă o sesiune guest existentă într-o sesiune autentificată."""
+        session.id_utilizator = user_id
+        session.data_ultima_activitate = datetime.now(UTC)
+        self.db.commit()
+        self.db.refresh(session)
+        return session
+
+    def revoke_session(self, raw_token: str | None) -> None:
+        session = self.get_active_session(raw_token)
+        if session:
+            session.revocata_la = datetime.now(UTC)
+            self.db.commit()
+
 
 def set_access_cookie(response: Response, token: str) -> None:
     response.set_cookie(
@@ -71,3 +99,7 @@ def set_access_cookie(response: Response, token: str) -> None:
         samesite='lax',
         secure=False,
     )
+
+
+def clear_access_cookie(response: Response) -> None:
+    response.delete_cookie(key=ACCESS_COOKIE_NAME, httponly=True, samesite='lax')
