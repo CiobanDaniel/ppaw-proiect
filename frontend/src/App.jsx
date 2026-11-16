@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import './App.css'
 
 const API_URL = '/api/v1'
+const ADMIN_CATEGORIES_PATH = '/admin/categorii-api'
 
 function messageFrom(error) {
   return error instanceof Error ? error.message : 'A apărut o eroare neașteptată.'
@@ -16,7 +17,120 @@ async function requestJson(path) {
   return response.json()
 }
 
-function App() {
+async function categoriesRequest(path, options = {}) {
+  const response = await fetch(`/api/categorii${path}`, {
+    credentials: 'same-origin',
+    headers: { 'Content-Type': 'application/json', ...options.headers },
+    ...options,
+  })
+  if (!response.ok) {
+    const body = await response.json().catch(() => null)
+    throw new Error(body?.detail || 'Operația nu a putut fi finalizată.')
+  }
+  return response.status === 204 ? null : response.json()
+}
+
+function CategoryManager() {
+  const [categorii, setCategorii] = useState([])
+  const [nume, setNume] = useState('')
+  const [descriere, setDescriere] = useState('')
+  const [editId, setEditId] = useState(null)
+  const [eroare, setEroare] = useState('')
+  const [mesaj, setMesaj] = useState('')
+  const [incarca, setIncarca] = useState(true)
+
+  const incarcaCategorii = () => {
+    setIncarca(true)
+    return categoriesRequest('')
+      .then(setCategorii)
+      .catch((error) => setEroare(messageFrom(error)))
+      .finally(() => setIncarca(false))
+  }
+
+  useEffect(() => {
+    let active = true
+    categoriesRequest('')
+      .then((date) => { if (active) setCategorii(date) })
+      .catch((error) => { if (active) setEroare(messageFrom(error)) })
+      .finally(() => { if (active) setIncarca(false) })
+    return () => { active = false }
+  }, [])
+
+  function resetForm() {
+    setEditId(null)
+    setNume('')
+    setDescriere('')
+  }
+
+  async function salveazaCategorie(event) {
+    event.preventDefault()
+    setEroare('')
+    setMesaj('')
+    try {
+      const payload = { nume, descriere: descriere || null }
+      if (editId) {
+        await categoriesRequest(`/${editId}`, { method: 'PUT', body: JSON.stringify(payload) })
+        setMesaj('Categoria a fost actualizată.')
+      } else {
+        await categoriesRequest('', { method: 'POST', body: JSON.stringify(payload) })
+        setMesaj('Categoria a fost creată.')
+      }
+      resetForm()
+      await incarcaCategorii()
+    } catch (error) {
+      setEroare(messageFrom(error))
+    }
+  }
+
+  function editeazaCategorie(categorie) {
+    setEditId(categorie.id)
+    setNume(categorie.nume)
+    setDescriere(categorie.descriere || '')
+    setMesaj('')
+    setEroare('')
+  }
+
+  async function stergeCategorie(categorie) {
+    if (!window.confirm(`Ștergi categoria „${categorie.nume}”?`)) return
+    setEroare('')
+    setMesaj('')
+    try {
+      await categoriesRequest(`/${categorie.id}`, { method: 'DELETE' })
+      if (editId === categorie.id) resetForm()
+      setMesaj('Categoria a fost ștearsă.')
+      await incarcaCategorii()
+    } catch (error) {
+      setEroare(messageFrom(error))
+    }
+  }
+
+  return (
+    <main className="admin-api-shell">
+      <header className="admin-api-header"><a className="brand" href="/admin">Creator Hub · Admin</a><a href="/">Vezi platforma</a></header>
+      <div className="admin-api-content">
+        <p className="eyebrow">Laborator 8 · frontend + API</p>
+        <h1>Gestionare categorii</h1>
+        <p className="description">Acest ecran React consumă direct endpointurile REST pentru categorii.</p>
+        {eroare && <div className="notice error" role="alert">{eroare}</div>}
+        {mesaj && <div className="notice" role="status">{mesaj}</div>}
+        <section className="category-manager">
+          <form className="category-form" onSubmit={salveazaCategorie}>
+            <h2>{editId ? 'Editează categoria' : 'Categorie nouă'}</h2>
+            <label>Nume<input value={nume} onChange={(event) => setNume(event.target.value)} required maxLength="100" /></label>
+            <label>Descriere<textarea value={descriere} onChange={(event) => setDescriere(event.target.value)} rows="4" /></label>
+            <div><button className="primary-button" type="submit">{editId ? 'Salvează' : 'Creează'}</button>{editId && <button className="text-button cancel-button" type="button" onClick={resetForm}>Anulează</button>}</div>
+          </form>
+          <section className="category-list" aria-labelledby="categories-title">
+            <h2 id="categories-title">Categorii existente</h2>
+            {incarca ? <p className="loading">Se încarcă…</p> : <ul>{categorii.map((categorie) => <li key={categorie.id}><div><strong>{categorie.nume}</strong><p>{categorie.descriere || 'Fără descriere'}</p></div><div className="category-actions"><button className="text-button" onClick={() => editeazaCategorie(categorie)}>Editează</button><button className="danger-button" onClick={() => stergeCategorie(categorie)}>Șterge</button></div></li>)}</ul>}
+          </section>
+        </section>
+      </div>
+    </main>
+  )
+}
+
+function PublicCatalog() {
   const [carti, setCarti] = useState([])
   const [carteSelectata, setCarteSelectata] = useState(null)
   const [capitolCitit, setCapitolCitit] = useState(null)
@@ -119,6 +233,10 @@ function App() {
       </section>
     </main>
   )
+}
+
+function App() {
+  return window.location.pathname === ADMIN_CATEGORIES_PATH ? <CategoryManager /> : <PublicCatalog />
 }
 
 export default App
