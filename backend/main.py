@@ -636,14 +636,14 @@ def evenimente_edit_post(
 @app.get("/plati")
 def plati_index(request: Request, accessor: PlatiAccessor = Depends(get_plati_accessor)):
     plati = accessor.get_toate_platile()
-    return templates.TemplateResponse(request=request, name="plati_index.html", context={"plati": plati})
+    return templates.TemplateResponse(request=request, name="admin/payments/index.html", context={"plati": plati})
 
 @app.get("/plati/rambursare/{plata_id}")
 def plati_rambursare_get(request: Request, plata_id: int, accessor: PlatiAccessor = Depends(get_plati_accessor)):
     plata = get_or_404(accessor.get_plata_by_id(plata_id), "Plata")
     if plata.stare != "finalizat":
         raise AdminValidationError("Doar o plată finalizată poate fi rambursată.")
-    return templates.TemplateResponse(request=request, name="plati_rambursare.html", context={"plata": plata, "admini": accessor.get_admini()})
+    return templates.TemplateResponse(request=request, name="admin/payments/refund.html", context={"plata": plata, "admini": accessor.get_admini()})
 
 
 @app.post("/plati/rambursare/{plata_id}")
