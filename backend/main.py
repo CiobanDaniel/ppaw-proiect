@@ -543,11 +543,11 @@ def comentarii_edit_post(
 @app.get("/abonamente")
 def abonamente_index(request: Request, accessor: NiveleAccessor = Depends(get_nivele_accessor)):
     nivele = accessor.get_toate_nivelele()
-    return templates.TemplateResponse(request=request, name="abonamente_index.html", context={"nivele": nivele})
+    return templates.TemplateResponse(request=request, name="admin/subscriptions/index.html", context={"nivele": nivele})
 
 @app.get("/abonamente/creare")
 def abonamente_create_get(request: Request):
-    return templates.TemplateResponse(request=request, name="abonamente_create.html", context={"request": request})
+    return templates.TemplateResponse(request=request, name="admin/subscriptions/create.html", context={"request": request})
 
 @app.post("/abonamente/creare")
 def abonamente_create_post(
@@ -564,7 +564,7 @@ def abonamente_create_post(
 @app.get("/abonamente/editare/{nivel_id}")
 def abonamente_edit_get(request: Request, nivel_id: int, accessor: NiveleAccessor = Depends(get_nivele_accessor)):
     nivel = get_or_404(accessor.get_nivel_by_id(nivel_id), "Nivelul de abonament")
-    return templates.TemplateResponse(request=request, name="abonamente_edit.html", context={"nivel": nivel})
+    return templates.TemplateResponse(request=request, name="admin/subscriptions/edit.html", context={"nivel": nivel})
 
 @app.post("/abonamente/editare/{nivel_id}")
 def abonamente_edit_post(
