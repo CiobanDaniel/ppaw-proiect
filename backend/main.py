@@ -233,16 +233,16 @@ def get_analitice_accessor():
 @app.get("/utilizatori")
 def index(request: Request, accessor: UtilizatoriAccessor = Depends(get_accessor)):
     utilizatori = accessor.get_all_users()
-    return templates.TemplateResponse(request=request, name="users_index.html", context={"utilizatori": utilizatori})
+    return templates.TemplateResponse(request=request, name="admin/users/index.html", context={"utilizatori": utilizatori})
 
 @app.get("/utilizatori/detalii/{user_id}")
 def details(request: Request, user_id: int, accessor: UtilizatoriAccessor = Depends(get_accessor)):
     utilizator = get_or_404(accessor.get_user_by_id(user_id), "Utilizatorul")
-    return templates.TemplateResponse(request=request, name="users_details.html", context={"utilizator": utilizator})
+    return templates.TemplateResponse(request=request, name="admin/users/details.html", context={"utilizator": utilizator})
 
 @app.get("/utilizatori/creare")
 def create_get(request: Request):
-    return templates.TemplateResponse(request=request, name="users_create.html")
+    return templates.TemplateResponse(request=request, name="admin/users/create.html")
 
 @app.post("/utilizatori/creare")
 def create_post(
@@ -262,7 +262,7 @@ def create_post(
 @app.get("/utilizatori/editare/{user_id}")
 def edit_get(request: Request, user_id: int, accessor: UtilizatoriAccessor = Depends(get_accessor)):
     utilizator = get_or_404(accessor.get_user_by_id(user_id), "Utilizatorul")
-    return templates.TemplateResponse(request=request, name="users_edit.html", context={"utilizator": utilizator})
+    return templates.TemplateResponse(request=request, name="admin/users/edit.html", context={"utilizator": utilizator})
 
 @app.post("/utilizatori/editare/{user_id}")
 def edit_post(
