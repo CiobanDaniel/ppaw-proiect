@@ -3,7 +3,10 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 
-from ..config import ADMIN_PREFIX
+try:
+    from ..config import ADMIN_PREFIX
+except ImportError:
+    from config import ADMIN_PREFIX
 from .common import templates
 
 

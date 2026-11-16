@@ -8,14 +8,24 @@ from fastapi import HTTPException, Request
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from ..config import ADMIN_PREFIX, BASE_DIR
-from ..crud import (
-    AdminOperationError, AlerteAccessor, AnaliticeAccessor, CapitoleAccessor,
-    CartiAccessor, CategoriiAccessor, CereriRetragereAccessor, ComentariiAccessor,
-    EvenimenteAccessor, NiveleAccessor, NotificariAccessor, PlatiAccessor,
-    RapoarteAccessor, RecenziiAccessor, SessionLocal, SetariAccessor,
-    UtilizatoriAccessor,
-)
+try:
+    from ..config import ADMIN_PREFIX, BASE_DIR
+    from ..crud import (
+        AdminOperationError, AlerteAccessor, AnaliticeAccessor, CapitoleAccessor,
+        CartiAccessor, CategoriiAccessor, CereriRetragereAccessor, ComentariiAccessor,
+        EvenimenteAccessor, NiveleAccessor, NotificariAccessor, PlatiAccessor,
+        RapoarteAccessor, RecenziiAccessor, SessionLocal, SetariAccessor,
+        UtilizatoriAccessor,
+    )
+except ImportError:
+    from config import ADMIN_PREFIX, BASE_DIR
+    from crud import (
+        AdminOperationError, AlerteAccessor, AnaliticeAccessor, CapitoleAccessor,
+        CartiAccessor, CategoriiAccessor, CereriRetragereAccessor, ComentariiAccessor,
+        EvenimenteAccessor, NiveleAccessor, NotificariAccessor, PlatiAccessor,
+        RapoarteAccessor, RecenziiAccessor, SessionLocal, SetariAccessor,
+        UtilizatoriAccessor,
+    )
 
 
 templates = Jinja2Templates(directory=str(BASE_DIR / 'templates'))

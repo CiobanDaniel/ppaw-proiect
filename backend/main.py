@@ -8,15 +8,26 @@ from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, Red
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.exc import IntegrityError
 
-from .access_sessions import ACCESS_COOKIE_NAME, AccessSessionService, clear_access_cookie, set_access_cookie
-from .admin.common import AdminOperationError, AdminValidationError, return_to_form, templates
-from .admin.router import admin_router
-from .api_router import api_router
-from .authentication import authenticate_admin
-from .config import ADMIN_LEGACY_PREFIXES, ADMIN_PREFIX, FRONTEND_DIST_DIR
-from .crud import SessionLocal
-from .models import Utilizatori
-from .public_catalog_router import public_catalog_router
+try:  # Compatibil cu `uvicorn backend.main:app` și `uvicorn main:app` din backend.
+    from .access_sessions import ACCESS_COOKIE_NAME, AccessSessionService, clear_access_cookie, set_access_cookie
+    from .admin.common import AdminOperationError, AdminValidationError, return_to_form, templates
+    from .admin.router import admin_router
+    from .api_router import api_router
+    from .authentication import authenticate_admin
+    from .config import ADMIN_LEGACY_PREFIXES, ADMIN_PREFIX, FRONTEND_DIST_DIR
+    from .crud import SessionLocal
+    from .models import Utilizatori
+    from .public_catalog_router import public_catalog_router
+except ImportError:
+    from access_sessions import ACCESS_COOKIE_NAME, AccessSessionService, clear_access_cookie, set_access_cookie
+    from admin.common import AdminOperationError, AdminValidationError, return_to_form, templates
+    from admin.router import admin_router
+    from api_router import api_router
+    from authentication import authenticate_admin
+    from config import ADMIN_LEGACY_PREFIXES, ADMIN_PREFIX, FRONTEND_DIST_DIR
+    from crud import SessionLocal
+    from models import Utilizatori
+    from public_catalog_router import public_catalog_router
 
 
 app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
