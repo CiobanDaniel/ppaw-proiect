@@ -91,7 +91,7 @@ uvicorn backend.main:app --reload --port 8080
 
 * **Frontend CRUD pentru laborator**: [http://127.0.0.1:8080/admin/categorii-api](http://127.0.0.1:8080/admin/categorii-api) consumă operațiile `GET`, `POST`, `PUT` și `DELETE` de la `/api/categorii`. Operațiile care modifică datele cer sesiunea administratorului.
 
-* **Documentația API (Swagger)**: [http://127.0.0.1:8080/docs](http://127.0.0.1:8080/docs) documentează API-ul. Nu este nevoie de DNS pentru rularea locală; pentru publicare, un reverse proxy poate direcționa domeniul către același proces FastAPI, fără a expune porturi diferite pentru frontend și API.
+* **Documentația API (Swagger)**: [http://127.0.0.1:8080/admin/docs](http://127.0.0.1:8080/admin/docs) folosește aceeași sesiune de administrator ca MVC-ul. Adresele vechi `/docs`, `/redoc` și `/openapi.json` redirecționează către zona protejată. Nu este nevoie de DNS pentru rularea locală; pentru publicare, un reverse proxy poate direcționa domeniul către același proces FastAPI, fără a expune porturi diferite pentru frontend și API.
 
 ## Structura Proiectului
 
