@@ -523,12 +523,12 @@ def recenzii_edit_post(
 @app.get("/comentarii")
 def comentarii_index(request: Request, accessor: ComentariiAccessor = Depends(get_comentarii_accessor)):
     comentarii = accessor.get_toate_comentariile()
-    return templates.TemplateResponse(request=request, name="comentarii_index.html", context={"comentarii": comentarii})
+    return templates.TemplateResponse(request=request, name="admin/comments/index.html", context={"comentarii": comentarii})
 
 @app.get("/comentarii/editare/{com_id}")
 def comentarii_edit_get(request: Request, com_id: int, accessor: ComentariiAccessor = Depends(get_comentarii_accessor)):
     comentariu = get_or_404(accessor.get_comentariu_by_id(com_id), "Comentariul")
-    return templates.TemplateResponse(request=request, name="comentarii_edit.html", context={"comentariu": comentariu})
+    return templates.TemplateResponse(request=request, name="admin/comments/edit.html", context={"comentariu": comentariu})
 
 @app.post("/comentarii/editare/{com_id}")
 def comentarii_edit_post(
