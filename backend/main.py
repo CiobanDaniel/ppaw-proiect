@@ -219,7 +219,7 @@ def get_notificari_accessor():
 def home(request: Request):
     return templates.TemplateResponse(
         request=request, 
-        name="home.html", 
+        name="admin/dashboard/home.html",
         context={"request": request}
     )
 
@@ -233,16 +233,16 @@ def get_analitice_accessor():
 @app.get("/utilizatori")
 def index(request: Request, accessor: UtilizatoriAccessor = Depends(get_accessor)):
     utilizatori = accessor.get_all_users()
-    return templates.TemplateResponse(request=request, name="users_index.html", context={"utilizatori": utilizatori})
+    return templates.TemplateResponse(request=request, name="admin/users/index.html", context={"utilizatori": utilizatori})
 
 @app.get("/utilizatori/detalii/{user_id}")
 def details(request: Request, user_id: int, accessor: UtilizatoriAccessor = Depends(get_accessor)):
     utilizator = get_or_404(accessor.get_user_by_id(user_id), "Utilizatorul")
-    return templates.TemplateResponse(request=request, name="users_details.html", context={"utilizator": utilizator})
+    return templates.TemplateResponse(request=request, name="admin/users/details.html", context={"utilizator": utilizator})
 
 @app.get("/utilizatori/creare")
 def create_get(request: Request):
-    return templates.TemplateResponse(request=request, name="users_create.html")
+    return templates.TemplateResponse(request=request, name="admin/users/create.html")
 
 @app.post("/utilizatori/creare")
 def create_post(
@@ -262,7 +262,7 @@ def create_post(
 @app.get("/utilizatori/editare/{user_id}")
 def edit_get(request: Request, user_id: int, accessor: UtilizatoriAccessor = Depends(get_accessor)):
     utilizator = get_or_404(accessor.get_user_by_id(user_id), "Utilizatorul")
-    return templates.TemplateResponse(request=request, name="users_edit.html", context={"utilizator": utilizator})
+    return templates.TemplateResponse(request=request, name="admin/users/edit.html", context={"utilizator": utilizator})
 
 @app.post("/utilizatori/editare/{user_id}")
 def edit_post(
@@ -282,13 +282,13 @@ def edit_post(
 @app.get("/carti")
 def carti_index(request: Request, accessor: CartiAccessor = Depends(get_carti_accessor)):
     carti = accessor.get_all_carti()
-    return templates.TemplateResponse(request=request, name="carti_index.html", context={"carti": carti})
+    return templates.TemplateResponse(request=request, name="admin/books/index.html", context={"carti": carti})
 
 @app.get("/carti/creare")
 def carti_create_get(request: Request, accessor: CartiAccessor = Depends(get_carti_accessor)):
     # Trimitem lista de autori către View pentru a popula dropdown-ul
     autori = accessor.get_autori_pentru_dropdown()
-    return templates.TemplateResponse(request=request, name="carti_create.html", context={"autori": autori})
+    return templates.TemplateResponse(request=request, name="admin/books/create.html", context={"autori": autori})
 
 @app.post("/carti/creare")
 def carti_create_post(
@@ -305,13 +305,13 @@ def carti_create_post(
 @app.get("/carti/detalii/{carte_id}")
 def carti_details(request: Request, carte_id: int, accessor: CartiAccessor = Depends(get_carti_accessor)):
     carte = get_or_404(accessor.get_carte_by_id(carte_id), "Cartea")
-    return templates.TemplateResponse(request=request, name="carti_details.html", context={"carte": carte})
+    return templates.TemplateResponse(request=request, name="admin/books/details.html", context={"carte": carte})
 
 @app.get("/carti/editare/{carte_id}")
 def carti_edit_get(request: Request, carte_id: int, accessor: CartiAccessor = Depends(get_carti_accessor)):
     carte = get_or_404(accessor.get_carte_by_id(carte_id), "Cartea")
     autori = accessor.get_autori_pentru_dropdown()
-    return templates.TemplateResponse(request=request, name="carti_edit.html", context={"carte": carte, "autori": autori})
+    return templates.TemplateResponse(request=request, name="admin/books/edit.html", context={"carte": carte, "autori": autori})
 
 @app.post("/carti/editare/{carte_id}")
 def carti_edit_post(
@@ -329,11 +329,11 @@ def carti_edit_post(
 @app.get("/categorii")
 def categorii_index(request: Request, accessor: CategoriiAccessor = Depends(get_categorii_accessor)):
     categorii = accessor.get_toate_categoriile()
-    return templates.TemplateResponse(request=request, name="categorii_index.html", context={"categorii": categorii})
+    return templates.TemplateResponse(request=request, name="admin/categories/index.html", context={"categorii": categorii})
 
 @app.get("/categorii/creare")
 def categorii_create_get(request: Request):
-    return templates.TemplateResponse(request=request, name="categorii_create.html", context={"request": request})
+    return templates.TemplateResponse(request=request, name="admin/categories/create.html", context={"request": request})
 
 @app.post("/categorii/creare")
 def categorii_create_post(
@@ -348,7 +348,7 @@ def categorii_create_post(
 @app.get("/categorii/editare/{cat_id}")
 def categorii_edit_get(request: Request, cat_id: int, accessor: CategoriiAccessor = Depends(get_categorii_accessor)):
     categorie = get_or_404(accessor.get_categorie_by_id(cat_id), "Categoria")
-    return templates.TemplateResponse(request=request, name="categorii_edit.html", context={"categorie": categorie})
+    return templates.TemplateResponse(request=request, name="admin/categories/edit.html", context={"categorie": categorie})
 
 @app.post("/categorii/editare/{cat_id}")
 def categorii_edit_post(
@@ -364,11 +364,11 @@ def categorii_edit_post(
 @app.get("/setari")
 def setari_index(request: Request, accessor: SetariAccessor = Depends(get_setari_accessor)):
     setari = accessor.get_toate_setarile()
-    return templates.TemplateResponse(request=request, name="setari_index.html", context={"setari": setari})
+    return templates.TemplateResponse(request=request, name="admin/settings/index.html", context={"setari": setari})
 
 @app.get("/setari/creare")
 def setari_create_get(request: Request):
-    return templates.TemplateResponse(request=request, name="setari_create.html", context={"request": request})
+    return templates.TemplateResponse(request=request, name="admin/settings/create.html", context={"request": request})
 
 @app.post("/setari/creare")
 def setari_create_post(
@@ -383,7 +383,7 @@ def setari_create_post(
 @app.get("/setari/editare/{setare_id}")
 def setari_edit_get(request: Request, setare_id: int, accessor: SetariAccessor = Depends(get_setari_accessor)):
     setare = get_or_404(accessor.get_setare_by_id(setare_id), "Setarea")
-    return templates.TemplateResponse(request=request, name="setari_edit.html", context={"setare": setare})
+    return templates.TemplateResponse(request=request, name="admin/settings/edit.html", context={"setare": setare})
 
 @app.post("/setari/editare/{setare_id}")
 def setari_edit_post(
@@ -399,11 +399,11 @@ def setari_edit_post(
 @app.get("/alerte")
 def alerte_index(request: Request, accessor: AlerteAccessor = Depends(get_alerte_accessor)):
     alerte = accessor.get_toate_alertele()
-    return templates.TemplateResponse(request=request, name="alerte_index.html", context={"alerte": alerte})
+    return templates.TemplateResponse(request=request, name="admin/alerts/index.html", context={"alerte": alerte})
 
 @app.get("/alerte/creare")
 def alerte_create_get(request: Request):
-    return templates.TemplateResponse(request=request, name="alerte_create.html", context={"request": request})
+    return templates.TemplateResponse(request=request, name="admin/alerts/create.html", context={"request": request})
 
 @app.post("/alerte/creare")
 def alerte_create_post(
@@ -418,7 +418,7 @@ def alerte_create_post(
 @app.get("/alerte/editare/{alerta_id}")
 def alerte_edit_get(request: Request, alerta_id: int, accessor: AlerteAccessor = Depends(get_alerte_accessor)):
     alerta = get_or_404(accessor.get_alerta_by_id(alerta_id), "Alerta")
-    return templates.TemplateResponse(request=request, name="alerte_edit.html", context={"alerta": alerta})
+    return templates.TemplateResponse(request=request, name="admin/alerts/edit.html", context={"alerta": alerta})
 
 @app.post("/alerte/editare/{alerta_id}")
 def alerte_edit_post(
@@ -434,17 +434,17 @@ def alerte_edit_post(
 @app.get("/capitole")
 def capitole_index(request: Request, accessor: CapitoleAccessor = Depends(get_capitole_accessor)):
     capitole = accessor.get_toate_capitolele()
-    return templates.TemplateResponse(request=request, name="capitole_index.html", context={"capitole": capitole})
+    return templates.TemplateResponse(request=request, name="admin/chapters/index.html", context={"capitole": capitole})
 
 @app.get("/capitole/detalii/{cap_id}")
 def capitole_details(request: Request, cap_id: int, accessor: CapitoleAccessor = Depends(get_capitole_accessor)):
     capitol = get_or_404(accessor.get_capitol_by_id(cap_id), "Capitolul")
-    return templates.TemplateResponse(request=request, name="capitole_details.html", context={"capitol": capitol})
+    return templates.TemplateResponse(request=request, name="admin/chapters/details.html", context={"capitol": capitol})
 
 @app.get("/capitole/creare")
 def capitole_create_get(request: Request, accessor: CapitoleAccessor = Depends(get_capitole_accessor)):
     carti = accessor.get_carti_pentru_dropdown()
-    return templates.TemplateResponse(request=request, name="capitole_create.html", context={"carti": carti})
+    return templates.TemplateResponse(request=request, name="admin/chapters/create.html", context={"carti": carti})
 
 @app.post("/capitole/creare")
 def capitole_create_post(
@@ -472,7 +472,7 @@ def capitole_create_post(
 def capitole_edit_get(request: Request, cap_id: int, accessor: CapitoleAccessor = Depends(get_capitole_accessor)):
     capitol = get_or_404(accessor.get_capitol_by_id(cap_id), "Capitolul")
     carti = accessor.get_carti_pentru_dropdown()
-    return templates.TemplateResponse(request=request, name="capitole_edit.html", context={"capitol": capitol, "carti": carti})
+    return templates.TemplateResponse(request=request, name="admin/chapters/edit.html", context={"capitol": capitol, "carti": carti})
 
 @app.post("/capitole/editare/{cap_id}")
 def capitole_edit_post(
@@ -500,12 +500,12 @@ def capitole_edit_post(
 @app.get("/recenzii")
 def recenzii_index(request: Request, accessor: RecenziiAccessor = Depends(get_recenzii_accessor)):
     recenzii = accessor.get_toate_recenziile()
-    return templates.TemplateResponse(request=request, name="recenzii_index.html", context={"recenzii": recenzii})
+    return templates.TemplateResponse(request=request, name="admin/reviews/index.html", context={"recenzii": recenzii})
 
 @app.get("/recenzii/editare/{rec_id}")
 def recenzii_edit_get(request: Request, rec_id: int, accessor: RecenziiAccessor = Depends(get_recenzii_accessor)):
     recenzie = get_or_404(accessor.get_recenzie_by_id(rec_id), "Recenzia")
-    return templates.TemplateResponse(request=request, name="recenzii_edit.html", context={"recenzie": recenzie})
+    return templates.TemplateResponse(request=request, name="admin/reviews/edit.html", context={"recenzie": recenzie})
 
 @app.post("/recenzii/editare/{rec_id}")
 def recenzii_edit_post(
@@ -523,12 +523,12 @@ def recenzii_edit_post(
 @app.get("/comentarii")
 def comentarii_index(request: Request, accessor: ComentariiAccessor = Depends(get_comentarii_accessor)):
     comentarii = accessor.get_toate_comentariile()
-    return templates.TemplateResponse(request=request, name="comentarii_index.html", context={"comentarii": comentarii})
+    return templates.TemplateResponse(request=request, name="admin/comments/index.html", context={"comentarii": comentarii})
 
 @app.get("/comentarii/editare/{com_id}")
 def comentarii_edit_get(request: Request, com_id: int, accessor: ComentariiAccessor = Depends(get_comentarii_accessor)):
     comentariu = get_or_404(accessor.get_comentariu_by_id(com_id), "Comentariul")
-    return templates.TemplateResponse(request=request, name="comentarii_edit.html", context={"comentariu": comentariu})
+    return templates.TemplateResponse(request=request, name="admin/comments/edit.html", context={"comentariu": comentariu})
 
 @app.post("/comentarii/editare/{com_id}")
 def comentarii_edit_post(
@@ -543,11 +543,11 @@ def comentarii_edit_post(
 @app.get("/abonamente")
 def abonamente_index(request: Request, accessor: NiveleAccessor = Depends(get_nivele_accessor)):
     nivele = accessor.get_toate_nivelele()
-    return templates.TemplateResponse(request=request, name="abonamente_index.html", context={"nivele": nivele})
+    return templates.TemplateResponse(request=request, name="admin/subscriptions/index.html", context={"nivele": nivele})
 
 @app.get("/abonamente/creare")
 def abonamente_create_get(request: Request):
-    return templates.TemplateResponse(request=request, name="abonamente_create.html", context={"request": request})
+    return templates.TemplateResponse(request=request, name="admin/subscriptions/create.html", context={"request": request})
 
 @app.post("/abonamente/creare")
 def abonamente_create_post(
@@ -564,7 +564,7 @@ def abonamente_create_post(
 @app.get("/abonamente/editare/{nivel_id}")
 def abonamente_edit_get(request: Request, nivel_id: int, accessor: NiveleAccessor = Depends(get_nivele_accessor)):
     nivel = get_or_404(accessor.get_nivel_by_id(nivel_id), "Nivelul de abonament")
-    return templates.TemplateResponse(request=request, name="abonamente_edit.html", context={"nivel": nivel})
+    return templates.TemplateResponse(request=request, name="admin/subscriptions/edit.html", context={"nivel": nivel})
 
 @app.post("/abonamente/editare/{nivel_id}")
 def abonamente_edit_post(
@@ -582,11 +582,11 @@ def abonamente_edit_post(
 @app.get("/evenimente")
 def evenimente_index(request: Request, accessor: EvenimenteAccessor = Depends(get_evenimente_accessor)):
     evenimente = accessor.get_toate_evenimentele()
-    return templates.TemplateResponse(request=request, name="evenimente_index.html", context={"evenimente": evenimente})
+    return templates.TemplateResponse(request=request, name="admin/events/index.html", context={"evenimente": evenimente})
 
 @app.get("/evenimente/creare")
 def evenimente_create_get(request: Request):
-    return templates.TemplateResponse(request=request, name="evenimente_create.html", context={"request": request})
+    return templates.TemplateResponse(request=request, name="admin/events/create.html", context={"request": request})
 
 @app.post("/evenimente/creare")
 def evenimente_create_post(
@@ -611,7 +611,7 @@ def evenimente_create_post(
 @app.get("/evenimente/editare/{ev_id}")
 def evenimente_edit_get(request: Request, ev_id: int, accessor: EvenimenteAccessor = Depends(get_evenimente_accessor)):
     eveniment = get_or_404(accessor.get_eveniment_by_id(ev_id), "Evenimentul")
-    return templates.TemplateResponse(request=request, name="evenimente_edit.html", context={"eveniment": eveniment})
+    return templates.TemplateResponse(request=request, name="admin/events/edit.html", context={"eveniment": eveniment})
 
 @app.post("/evenimente/editare/{ev_id}")
 def evenimente_edit_post(
@@ -636,14 +636,14 @@ def evenimente_edit_post(
 @app.get("/plati")
 def plati_index(request: Request, accessor: PlatiAccessor = Depends(get_plati_accessor)):
     plati = accessor.get_toate_platile()
-    return templates.TemplateResponse(request=request, name="plati_index.html", context={"plati": plati})
+    return templates.TemplateResponse(request=request, name="admin/payments/index.html", context={"plati": plati})
 
 @app.get("/plati/rambursare/{plata_id}")
 def plati_rambursare_get(request: Request, plata_id: int, accessor: PlatiAccessor = Depends(get_plati_accessor)):
     plata = get_or_404(accessor.get_plata_by_id(plata_id), "Plata")
     if plata.stare != "finalizat":
         raise AdminValidationError("Doar o plată finalizată poate fi rambursată.")
-    return templates.TemplateResponse(request=request, name="plati_rambursare.html", context={"plata": plata, "admini": accessor.get_admini()})
+    return templates.TemplateResponse(request=request, name="admin/payments/refund.html", context={"plata": plata, "admini": accessor.get_admini()})
 
 
 @app.post("/plati/rambursare/{plata_id}")
@@ -660,14 +660,14 @@ def plati_rambursare_post(
 @app.get("/cereri-retragere")
 def cereri_index(request: Request, accessor: CereriRetragereAccessor = Depends(get_cereri_accessor)):
     cereri = accessor.get_toate_cererile()
-    return templates.TemplateResponse(request=request, name="cereri_index.html", context={"cereri": cereri})
+    return templates.TemplateResponse(request=request, name="admin/withdrawals/index.html", context={"cereri": cereri})
 
 @app.get("/cereri-retragere/procesare/{cerere_id}")
 def cereri_procesare_get(request: Request, cerere_id: int, accessor: CereriRetragereAccessor = Depends(get_cereri_accessor)):
     cerere = get_or_404(accessor.get_cerere_by_id(cerere_id), "Cererea de retragere")
     if cerere.stare != "in_asteptare":
         raise AdminValidationError("Această cerere a fost deja procesată.")
-    return templates.TemplateResponse(request=request, name="cereri_procesare.html", context={"cerere": cerere, "admini": accessor.get_admini()})
+    return templates.TemplateResponse(request=request, name="admin/withdrawals/process.html", context={"cerere": cerere, "admini": accessor.get_admini()})
 
 @app.post("/cereri-retragere/procesare/{cerere_id}")
 def cereri_procesare_post(
@@ -685,13 +685,13 @@ def cereri_procesare_post(
 @app.get("/rapoarte")
 def rapoarte_index(request: Request, accessor: RapoarteAccessor = Depends(get_rapoarte_accessor)):
     rapoarte = accessor.get_toate_rapoartele()
-    return templates.TemplateResponse(request=request, name="rapoarte_index.html", context={"rapoarte": rapoarte})
+    return templates.TemplateResponse(request=request, name="admin/reports/index.html", context={"rapoarte": rapoarte})
 
 @app.get("/rapoarte/rezolvare/{rap_id}")
 def rapoarte_rezolvare_get(request: Request, rap_id: int, accessor: RapoarteAccessor = Depends(get_rapoarte_accessor)):
     raport = get_or_404(accessor.get_raport_by_id(rap_id), "Raportul")
     admini = accessor.get_admini()
-    return templates.TemplateResponse(request=request, name="rapoarte_rezolvare.html", context={"raport": raport, "admini": admini})
+    return templates.TemplateResponse(request=request, name="admin/reports/resolve.html", context={"raport": raport, "admini": admini})
 
 @app.post("/rapoarte/rezolvare/{rap_id}")
 def rapoarte_rezolvare_post(
@@ -708,12 +708,12 @@ def rapoarte_rezolvare_post(
 @app.get("/notificari")
 def notificari_index(request: Request, accessor: NotificariAccessor = Depends(get_notificari_accessor)):
     notificari = accessor.get_toate_notificarile()
-    return templates.TemplateResponse(request=request, name="notificari_index.html", context={"notificari": notificari})
+    return templates.TemplateResponse(request=request, name="admin/notifications/index.html", context={"notificari": notificari})
 
 @app.get("/notificari/creare")
 def notificari_creare_get(request: Request, accessor: NotificariAccessor = Depends(get_notificari_accessor)):
     utilizatori = accessor.get_utilizatori()
-    return templates.TemplateResponse(request=request, name="notificari_create.html", context={"utilizatori": utilizatori})
+    return templates.TemplateResponse(request=request, name="admin/notifications/create.html", context={"utilizatori": utilizatori})
 
 @app.post("/notificari/creare")
 def notificari_creare_post(
@@ -729,9 +729,9 @@ def notificari_creare_post(
 @app.get("/analitice/abonamente")
 def analitice_abonamente(request: Request, accessor: AnaliticeAccessor = Depends(get_analitice_accessor)):
     abonamente = accessor.get_istoric_abonamente()
-    return templates.TemplateResponse(request=request, name="analitice_abonamente.html", context={"abonamente": abonamente})
+    return templates.TemplateResponse(request=request, name="admin/analytics/subscriptions.html", context={"abonamente": abonamente})
 
 @app.get("/analitice/puncte")
 def analitice_puncte(request: Request, accessor: AnaliticeAccessor = Depends(get_analitice_accessor)):
     tranzactii = accessor.get_tranzactii_puncte()
-    return templates.TemplateResponse(request=request, name="analitice_puncte.html", context={"tranzactii": tranzactii})
+    return templates.TemplateResponse(request=request, name="admin/analytics/points.html", context={"tranzactii": tranzactii})
