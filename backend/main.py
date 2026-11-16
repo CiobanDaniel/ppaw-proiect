@@ -685,13 +685,13 @@ def cereri_procesare_post(
 @app.get("/rapoarte")
 def rapoarte_index(request: Request, accessor: RapoarteAccessor = Depends(get_rapoarte_accessor)):
     rapoarte = accessor.get_toate_rapoartele()
-    return templates.TemplateResponse(request=request, name="rapoarte_index.html", context={"rapoarte": rapoarte})
+    return templates.TemplateResponse(request=request, name="admin/reports/index.html", context={"rapoarte": rapoarte})
 
 @app.get("/rapoarte/rezolvare/{rap_id}")
 def rapoarte_rezolvare_get(request: Request, rap_id: int, accessor: RapoarteAccessor = Depends(get_rapoarte_accessor)):
     raport = get_or_404(accessor.get_raport_by_id(rap_id), "Raportul")
     admini = accessor.get_admini()
-    return templates.TemplateResponse(request=request, name="rapoarte_rezolvare.html", context={"raport": raport, "admini": admini})
+    return templates.TemplateResponse(request=request, name="admin/reports/resolve.html", context={"raport": raport, "admini": admini})
 
 @app.post("/rapoarte/rezolvare/{rap_id}")
 def rapoarte_rezolvare_post(
