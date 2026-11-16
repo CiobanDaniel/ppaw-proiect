@@ -8,6 +8,7 @@ import hashlib
 import secrets
 
 from sqlalchemy.orm import Session
+from fastapi import Response
 
 try:
     from .models import SesiuniAcces
@@ -16,6 +17,7 @@ except ImportError:
 
 
 GUEST_SESSION_DAYS = 30
+ACCESS_COOKIE_NAME = 'ppaw_access'
 
 
 @dataclass(frozen=True)
@@ -58,3 +60,14 @@ class AccessSessionService:
         self.db.commit()
         self.db.refresh(session)
         return AccessSessionResult(session=session, token_to_set=token)
+
+
+def set_access_cookie(response: Response, token: str) -> None:
+    response.set_cookie(
+        key=ACCESS_COOKIE_NAME,
+        value=token,
+        max_age=GUEST_SESSION_DAYS * 24 * 60 * 60,
+        httponly=True,
+        samesite='lax',
+        secure=False,
+    )

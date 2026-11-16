@@ -20,10 +20,13 @@ app = FastAPI()
 
 try:
     from .api_router import api_router
+    from .public_catalog_router import public_catalog_router
 except ImportError:
     from api_router import api_router
+    from public_catalog_router import public_catalog_router
 
 app.include_router(api_router)
+app.include_router(public_catalog_router)
 
 BASE_DIR = Path(__file__).resolve().parent
 VALID_ROLES = {"cititor", "autor", "admin"}

@@ -8,15 +8,14 @@ from pydantic import BaseModel
 # Importă SessionLocal și accessors din crud
 try:
     from .crud import CategoriiAccessor # sau alte entități dorite
-    from .access_sessions import AccessSessionService, GUEST_SESSION_DAYS
+    from .access_sessions import ACCESS_COOKIE_NAME, AccessSessionService, set_access_cookie
     from .api_dependencies import get_db
 except ImportError:
     from crud import CategoriiAccessor
-    from access_sessions import AccessSessionService, GUEST_SESSION_DAYS
+    from access_sessions import ACCESS_COOKIE_NAME, AccessSessionService, set_access_cookie
     from api_dependencies import get_db
 
 api_router = APIRouter(prefix="/api", tags=["API Lab 7"])
-ACCESS_COOKIE_NAME = "ppaw_access"
 
 # --- EXERCIȚIUL 2: Modele/DTO-uri separate (Scheme Pydantic) ---
 class CategorieCreateUpdateSchema(BaseModel):
@@ -44,14 +43,7 @@ def get_sau_creeaza_sesiune(request: Request, response: Response, db: Session = 
     result = AccessSessionService(db).get_or_create_guest_session(request.cookies.get(ACCESS_COOKIE_NAME))
     session = result.session
     if result.token_to_set:
-        response.set_cookie(
-            key=ACCESS_COOKIE_NAME,
-            value=result.token_to_set,
-            max_age=GUEST_SESSION_DAYS * 24 * 60 * 60,
-            httponly=True,
-            samesite='lax',
-            secure=False,
-        )
+        set_access_cookie(response, result.token_to_set)
     autentificat = session.id_utilizator is not None
     return SesiuneAccesResponseSchema(
         tip_sesiune='autentificata' if autentificat else 'guest',
