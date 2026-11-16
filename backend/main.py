@@ -364,11 +364,11 @@ def categorii_edit_post(
 @app.get("/setari")
 def setari_index(request: Request, accessor: SetariAccessor = Depends(get_setari_accessor)):
     setari = accessor.get_toate_setarile()
-    return templates.TemplateResponse(request=request, name="setari_index.html", context={"setari": setari})
+    return templates.TemplateResponse(request=request, name="admin/settings/index.html", context={"setari": setari})
 
 @app.get("/setari/creare")
 def setari_create_get(request: Request):
-    return templates.TemplateResponse(request=request, name="setari_create.html", context={"request": request})
+    return templates.TemplateResponse(request=request, name="admin/settings/create.html", context={"request": request})
 
 @app.post("/setari/creare")
 def setari_create_post(
@@ -383,7 +383,7 @@ def setari_create_post(
 @app.get("/setari/editare/{setare_id}")
 def setari_edit_get(request: Request, setare_id: int, accessor: SetariAccessor = Depends(get_setari_accessor)):
     setare = get_or_404(accessor.get_setare_by_id(setare_id), "Setarea")
-    return templates.TemplateResponse(request=request, name="setari_edit.html", context={"setare": setare})
+    return templates.TemplateResponse(request=request, name="admin/settings/edit.html", context={"setare": setare})
 
 @app.post("/setari/editare/{setare_id}")
 def setari_edit_post(
