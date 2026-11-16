@@ -219,7 +219,7 @@ def get_notificari_accessor():
 def home(request: Request):
     return templates.TemplateResponse(
         request=request, 
-        name="home.html", 
+        name="admin/dashboard/home.html",
         context={"request": request}
     )
 
