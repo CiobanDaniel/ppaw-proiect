@@ -2,7 +2,7 @@ from typing import Optional
 import datetime
 import decimal
 
-from sqlalchemy import Boolean, CheckConstraint, Column, Date, DateTime, ForeignKeyConstraint, Integer, Numeric, PrimaryKeyConstraint, String, Table, Text, UniqueConstraint, text
+from sqlalchemy import Boolean, CheckConstraint, Column, Date, DateTime, ForeignKeyConstraint, Index, Integer, Numeric, PrimaryKeyConstraint, String, Table, Text, UniqueConstraint, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 class Base(DeclarativeBase):
@@ -111,6 +111,7 @@ class Utilizatori(Base):
     deblocari_capitole: Mapped[list['DeblocariCapitole']] = relationship('DeblocariCapitole', back_populates='utilizatori')
     progres_lectura: Mapped[list['ProgresLectura']] = relationship('ProgresLectura', back_populates='utilizatori')
     vizualizari_capitole: Mapped[list['VizualizariCapitole']] = relationship('VizualizariCapitole', back_populates='utilizatori')
+    sesiuni_acces: Mapped[list['SesiuniAcces']] = relationship('SesiuniAcces', back_populates='utilizatori')
 
 
 class Carti(Base):
@@ -429,10 +430,34 @@ class ProgresLectura(Base):
     utilizatori: Mapped[Optional['Utilizatori']] = relationship('Utilizatori', back_populates='progres_lectura')
 
 
+class SesiuniAcces(Base):
+    """Sesiune tehnică pentru un guest sau un utilizator autentificat, fără conturi fictive."""
+    __tablename__ = 'sesiuni_acces'
+    __table_args__ = (
+        CheckConstraint('expira_la IS NULL OR expira_la > data_crearii', name='sesiuni_acces_expirare_check'),
+        ForeignKeyConstraint(['id_utilizator'], ['utilizatori.id'], ondelete='SET NULL', name='sesiuni_acces_id_utilizator_fkey'),
+        PrimaryKeyConstraint('id', name='sesiuni_acces_pkey'),
+        UniqueConstraint('token_hash', name='sesiuni_acces_token_hash_key'),
+        Index('ix_sesiuni_acces_utilizator_activitate', 'id_utilizator', 'data_ultima_activitate'),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    token_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    id_utilizator: Mapped[Optional[int]] = mapped_column(Integer)
+    data_crearii: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime(True), server_default=text('CURRENT_TIMESTAMP'))
+    data_ultima_activitate: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime(True), server_default=text('CURRENT_TIMESTAMP'))
+    expira_la: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime(True))
+    revocata_la: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime(True))
+
+    utilizatori: Mapped[Optional['Utilizatori']] = relationship('Utilizatori', back_populates='sesiuni_acces')
+    vizualizari_capitole: Mapped[list['VizualizariCapitole']] = relationship('VizualizariCapitole', back_populates='sesiuni_acces')
+
+
 class VizualizariCapitole(Base):
     __tablename__ = 'vizualizari_capitole'
     __table_args__ = (
         ForeignKeyConstraint(['id_capitol'], ['capitole.id'], ondelete='CASCADE', name='vizualizari_capitole_id_capitol_fkey'),
+        ForeignKeyConstraint(['id_sesiune_acces'], ['sesiuni_acces.id'], ondelete='SET NULL', name='vizualizari_capitole_id_sesiune_acces_fkey'),
         ForeignKeyConstraint(['id_utilizator'], ['utilizatori.id'], ondelete='CASCADE', name='vizualizari_capitole_id_utilizator_fkey'),
         PrimaryKeyConstraint('id', name='vizualizari_capitole_pkey')
     )
@@ -440,10 +465,12 @@ class VizualizariCapitole(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     id_capitol: Mapped[Optional[int]] = mapped_column(Integer)
     id_utilizator: Mapped[Optional[int]] = mapped_column(Integer)
+    id_sesiune_acces: Mapped[Optional[int]] = mapped_column(Integer)
     data_vizualizarii: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime(True), server_default=text('CURRENT_TIMESTAMP'))
 
     capitole: Mapped[Optional['Capitole']] = relationship('Capitole', back_populates='vizualizari_capitole')
     utilizatori: Mapped[Optional['Utilizatori']] = relationship('Utilizatori', back_populates='vizualizari_capitole')
+    sesiuni_acces: Mapped[Optional['SesiuniAcces']] = relationship('SesiuniAcces', back_populates='vizualizari_capitole')
 
 class AlerteSistem(Base):
     __tablename__ = 'alerte_sistem'
