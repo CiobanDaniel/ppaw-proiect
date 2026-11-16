@@ -434,17 +434,17 @@ def alerte_edit_post(
 @app.get("/capitole")
 def capitole_index(request: Request, accessor: CapitoleAccessor = Depends(get_capitole_accessor)):
     capitole = accessor.get_toate_capitolele()
-    return templates.TemplateResponse(request=request, name="capitole_index.html", context={"capitole": capitole})
+    return templates.TemplateResponse(request=request, name="admin/chapters/index.html", context={"capitole": capitole})
 
 @app.get("/capitole/detalii/{cap_id}")
 def capitole_details(request: Request, cap_id: int, accessor: CapitoleAccessor = Depends(get_capitole_accessor)):
     capitol = get_or_404(accessor.get_capitol_by_id(cap_id), "Capitolul")
-    return templates.TemplateResponse(request=request, name="capitole_details.html", context={"capitol": capitol})
+    return templates.TemplateResponse(request=request, name="admin/chapters/details.html", context={"capitol": capitol})
 
 @app.get("/capitole/creare")
 def capitole_create_get(request: Request, accessor: CapitoleAccessor = Depends(get_capitole_accessor)):
     carti = accessor.get_carti_pentru_dropdown()
-    return templates.TemplateResponse(request=request, name="capitole_create.html", context={"carti": carti})
+    return templates.TemplateResponse(request=request, name="admin/chapters/create.html", context={"carti": carti})
 
 @app.post("/capitole/creare")
 def capitole_create_post(
@@ -472,7 +472,7 @@ def capitole_create_post(
 def capitole_edit_get(request: Request, cap_id: int, accessor: CapitoleAccessor = Depends(get_capitole_accessor)):
     capitol = get_or_404(accessor.get_capitol_by_id(cap_id), "Capitolul")
     carti = accessor.get_carti_pentru_dropdown()
-    return templates.TemplateResponse(request=request, name="capitole_edit.html", context={"capitol": capitol, "carti": carti})
+    return templates.TemplateResponse(request=request, name="admin/chapters/edit.html", context={"capitol": capitol, "carti": carti})
 
 @app.post("/capitole/editare/{cap_id}")
 def capitole_edit_post(
