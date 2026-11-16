@@ -7,22 +7,16 @@ from pydantic import BaseModel
 
 # Importă SessionLocal și accessors din crud
 try:
-    from .crud import SessionLocal, CategoriiAccessor # sau alte entități dorite
+    from .crud import CategoriiAccessor # sau alte entități dorite
     from .access_sessions import AccessSessionService, GUEST_SESSION_DAYS
+    from .api_dependencies import get_db
 except ImportError:
-    from crud import SessionLocal, CategoriiAccessor
+    from crud import CategoriiAccessor
     from access_sessions import AccessSessionService, GUEST_SESSION_DAYS
+    from api_dependencies import get_db
 
 api_router = APIRouter(prefix="/api", tags=["API Lab 7"])
 ACCESS_COOKIE_NAME = "ppaw_access"
-
-# Dependență pentru sesiune de BDD în API
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 # --- EXERCIȚIUL 2: Modele/DTO-uri separate (Scheme Pydantic) ---
 class CategorieCreateUpdateSchema(BaseModel):
