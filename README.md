@@ -1,113 +1,114 @@
-# Creator Hub — Platformă Integrată de Tip Creator (MVC & RESTful API)
+# Creator Hub
 
-Aplicație web robustă dezvoltată cu **FastAPI**, **SQLAlchemy ORM** și **Jinja2 (MVC)**, completată cu un modul dedicat de **RESTful API** pentru consumatori externi. Proiectul este, în prezent, un Minimum Viable Product (MVP) pentru administrarea completă a unei platforme de tip creator (gestiune utilizatori, conținut editorial, monetizare, abonamente, moderare și analitice).
+Creator Hub este un MVP database-first pentru o platformă de tip creator. Aplicația separă catalogul public de administrare, dar folosește aceeași bază de date PostgreSQL, aceeași aplicație FastAPI și aceeași origine HTTP.
 
----
+## Componente
 
-## Arhitectura Aplicației
+- Platformă publică React: catalogul cărților publicate și citirea capitolelor gratuite.
+- Sesiuni guest: un vizitator primește un cookie opac; nu se creează un rând fals în `utilizatori`.
+- Admin MVC: operații de administrare pentru conținut, comunitate, finanțe și sistem.
+- API REST: endpointuri Pydantic pentru categorii și catalogul public.
+- Documentație OpenAPI: disponibilă numai unui administrator autentificat.
 
-Proiectul folosește o arhitectură modulară și curată:
-1. **Nivelul de Acces la Date (ORM):** Modele mapate cu SQLAlchemy și gestionarea migrărilor prin **Alembic**.
-2. **Nivelul de Business / Servicii (CRUD & Logică):** Accesori and-logic separați pentru fiecare entitate în parte, gestionând constrângerile și operațiile în cascadă.
-3. **Interfața Administrativă (MVC):** Panou de control bazat pe șabloane Jinja2 și Bootstrap 5 pentru administrare vizuală completă.
-4. **Nivelul API RESTful:** Rute dedicate pentru clienții externi, structurate prin `APIRouter`, folosind scheme Pydantic pentru validare și mapare automată.
+## Structură
 
----
-
-## Entități Administrate (Modulul Admin & API)
-
-* **Utilizatori:** Gestiune conturi, roluri (`cititor`, `autor`, `admin`), stare cont și puncte.
-* **Cărți & Capitole:** Publicare de conținut, stabilire capitole gratuite sau cu plată (puncte).
-* **Economie și Finanțe:** Nivele de abonament (Tiers), evenimente promoționale, istoric plăți și cereri de retragere pentru autori.
-* **Moderare și Suport:** Recenzii, comentarii, rapoarte de conținut și notificări de sistem.
-* **Analitice (Read-Only):** Registru tranzacții puncte, istoric subscripții și vizualizări.
-
----
-
-## Pași de Instalare și Rulare locală
-
-### 1. Clonarea repository-ului și configurarea mediului
-
-Creează și activează un mediu virtual Python în directorul rădăcină:
-```bash
-python -m venv .venv
-# Pe Windows:
-.venv\Scripts\activate
-# Pe Mac/Linux:
-source .venv/bin/activate
+```text
+PPAW/
+├── alembic/                    # Migrări PostgreSQL
+├── backend/
+│   ├── admin/                  # Module MVC: content, community, finance, operations, docs
+│   ├── api_router.py           # API-ul categoriilor
+│   ├── public_catalog_router.py # API-ul catalogului public
+│   ├── access_sessions.py      # Cookie-uri și sesiuni persistate
+│   ├── authentication.py       # Derivarea parolei și verificarea adminului
+│   ├── config.py               # Configurare comună
+│   ├── crud.py                 # Accesori SQLAlchemy
+│   ├── models.py               # Modele ORM
+│   └── main.py                 # Punct de intrare FastAPI
+├── frontend/                   # React/Vite; `dist/` este produs de build
+├── alembic.ini
+├── requirements.txt
+└── README.md
 ```
 
-### 2. Instalarea dependențelor
+`backend/main.py` păstrează doar configurarea aplicației, securitatea zonei admin, excepțiile și servirea frontendului. Rutele MVC sunt împărțite pe domenii în `backend/admin/`.
 
-Instalează pachetele necesare specificate în fișierul de configurare:
+## Instalare locală
 
-```bash
+### 1. Mediu Python și dependențe
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
 
-### 3. Configurarea bazei de date
+### 2. Baza de date și migrările
 
-Asigură-te că ai configurat conexiunea la baza de date (PostgreSQL) în mediul tău local. Aplică migrările Alembic pentru a genera structura completă a tabelelor:
+Configurează PostgreSQL prin variabila `DATABASE_URL` sau actualizează configurația locală folosită de aplicație. Apoi rulează migrările:
 
-```bash
-alembic upgrade head
+```powershell
+.\.venv\Scripts\alembic.exe upgrade head
 ```
 
-### 4. Compilarea frontendului pentru producție
+### 3. Frontendul de producție
 
-Catalogul React nu este servit de Vite în timpul demonstrației. Instalează
-dependințele o singură dată și generează artefactele statice:
+FastAPI servește fișierele compilate din `frontend/dist`; Vite nu este necesar la demonstrația finală.
 
-```bash
-cd frontend
+```powershell
+Set-Location frontend
 npm ci
 npm run build
-cd ..
+Set-Location ..
 ```
 
-### 5. Crearea primului administrator
+Pentru dezvoltarea React se poate folosi și `npm run dev`. Configurația Vite trimite automat cererile `/api` către `http://127.0.0.1:8080`.
 
-Contul de administrator nu este introdus cu o parolă fixă în cod sau în
-migrări. Creează-l local după aplicarea migrărilor; comanda cere parola
-interactiv și o stochează derivată cu `scrypt` în baza de date:
+### 4. Primul administrator
 
-```bash
-.venv\Scripts\python.exe -m backend.create_admin admin admin@example.test
+Niciun cont cu parolă implicită nu este introdus în cod sau în migrări. Creează explicit un administrator; parola este solicitată interactiv și stocată derivată cu `scrypt`:
+
+```powershell
+.\.venv\Scripts\python.exe -m backend.create_admin admin admin@example.test
 ```
 
-### 6. Pornirea aplicației
+### 5. Pornirea aplicației
 
-Rulează serverul folosind uvicorn (aplicația rulează pe portul 8080):
+Din rădăcina proiectului:
 
-```bash
-uvicorn backend.main:app --reload --port 8080
+```powershell
+.\.venv\Scripts\uvicorn.exe backend.main:app --reload --port 8080
 ```
 
-## Ghid de utilizare și testare
+Alternativ, din directorul `backend`:
 
-* **Platforma publică**: [http://127.0.0.1:8080/](http://127.0.0.1:8080/) afișează catalogul React și permite citirea capitolelor gratuite. Vizitatorii guest primesc o sesiune opacă, fără rând nou în `utilizatori`.
-
-* **Panoul administrativ (MVC)**: [http://127.0.0.1:8080/admin/login](http://127.0.0.1:8080/admin/login) cere un cont cu rolul `admin`; după autentificare, panoul este la [http://127.0.0.1:8080/admin](http://127.0.0.1:8080/admin).
-
-* **Frontend CRUD pentru laborator**: [http://127.0.0.1:8080/admin/categorii-api](http://127.0.0.1:8080/admin/categorii-api) consumă operațiile `GET`, `POST`, `PUT` și `DELETE` de la `/api/categorii`. Operațiile care modifică datele cer sesiunea administratorului.
-
-* **Documentația API (Swagger)**: [http://127.0.0.1:8080/admin/docs](http://127.0.0.1:8080/admin/docs) folosește aceeași sesiune de administrator ca MVC-ul. Adresele vechi `/docs`, `/redoc` și `/openapi.json` redirecționează către zona protejată. Nu este nevoie de DNS pentru rularea locală; pentru publicare, un reverse proxy poate direcționa domeniul către același proces FastAPI, fără a expune porturi diferite pentru frontend și API.
-
-## Structura Proiectului
-
+```powershell
+..\.venv\Scripts\uvicorn.exe main:app --reload --port 8080
 ```
-PPAW/
-│
-├── alembic/              # Migrări bază de date (Alembic)
-├── backend/              # Logica aplicației FastAPI
-│   ├── api_router.py     # Rutele dedicate pentru REST API (Lab 7)
-│   ├── crud.py           # Accesori și logică de business / baza de date
-│   ├── main.py           # Punctul de intrare în aplicație și rutele MVC
-│   └── models.py         # Modelele SQLAlchemy
-├── frontend/             # Catalog React și interfața CRUD pentru API
-├── backend/templates/    # Fișierele HTML (Jinja2) pentru panoul de admin
-├── alembic.ini           # Configurare Alembic
-├── requirements.txt      # Dependențe Python
-└── README.md             # Documentația proiectului
-```
----
+
+Ambele comenzi sunt suportate.
+
+## Adrese locale
+
+| Adresă | Acces |
+| --- | --- |
+| [Platformă publică](http://127.0.0.1:8080/) | Public; catalog și capitole gratuite |
+| [Login admin](http://127.0.0.1:8080/admin/login) | Cont cu rol `admin` |
+| [MVC admin](http://127.0.0.1:8080/admin) | Sesiune admin |
+| [CRUD categorii](http://127.0.0.1:8080/admin/categorii-api) | Sesiune admin; consumă `GET`, `POST`, `PUT`, `DELETE` din `/api/categorii` |
+| [Swagger/OpenAPI](http://127.0.0.1:8080/admin/docs) | Sesiune admin; folosește același cookie ca MVC-ul |
+
+`/docs`, `/redoc` și `/openapi.json` redirecționează spre zona administrativă. După autentificare, documentația și MVC-ul utilizează același cookie `ppaw_access`.
+
+## API-uri
+
+- `/api/v1/carti` și `/api/v1/carti/{id}` sunt publice și oferă catalogul publicat.
+- `/api/v1/capitole/{id}/citire` permite numai capitole gratuite și creează/actualizează sesiunea guest.
+- `GET /api/categorii` este disponibil pentru citire.
+- `POST`, `PUT` și `DELETE /api/categorii` cer o sesiune de administrator.
+
+## Git și fișiere locale
+
+`.gitignore` exclude artefactele locale: medii virtuale, `__pycache__`, fișiere `.pyc`, directoare `tmp/`, buildul React, `.env`, loguri și cache-uri de test. Nu adăuga manual `frontend/dist`, fișiere temporare sau cache-uri Python în commituri.
+
+Pentru istoricul proiectului, păstrează commiturile mici și tematice, cu cel mult cinci fișiere per commit. Push-ul și PR-ul se fac după verificarea locală a tuturor commiturilor.
