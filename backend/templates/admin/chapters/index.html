@@ -33,6 +33,9 @@
             <td class="text-center">
                 <a href="/capitole/detalii/{{ c.id }}" class="btn btn-sm btn-outline-info">Citește</a>
                 <a href="/capitole/editare/{{ c.id }}" class="btn btn-sm btn-outline-primary">Editare</a>
+                <form action="/capitole/stergere/{{ c.id }}" method="post" class="d-inline" onsubmit="return confirm('Ștergi logic capitolul? Deblocările și progresul rămân în baza de date.');">
+                    <button class="btn btn-sm btn-outline-danger">Ștergere</button>
+                </form>
             </td>
         </tr>
         {% endfor %}
