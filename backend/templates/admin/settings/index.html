@@ -24,6 +24,9 @@
             <td>{{ s.data_actualizarii.strftime('%d-%m-%Y %H:%M') if s.data_actualizarii else '-' }}</td>
             <td class="text-center">
                 <a href="/setari/editare/{{ s.id }}" class="btn btn-sm btn-outline-primary">Modifică</a>
+                <form action="/setari/stergere/{{ s.id }}" method="post" class="d-inline" onsubmit="return confirm('Ștergi definitiv această setare?');">
+                    <button class="btn btn-sm btn-outline-danger">Ștergere</button>
+                </form>
             </td>
         </tr>
         {% endfor %}
