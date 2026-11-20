@@ -48,6 +48,7 @@ class NiveleAbonament(Base):
     nume: Mapped[str] = mapped_column(String(50), nullable=False)
     pret_real: Mapped[decimal.Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     descriere_beneficii: Mapped[Optional[str]] = mapped_column(Text)
+    este_sters: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text('false'))
 
     utilizatori: Mapped[list['Utilizatori']] = relationship('Utilizatori', back_populates='nivele_abonament')
     istoric_abonamente: Mapped[list['IstoricAbonamente']] = relationship('IstoricAbonamente', back_populates='nivele_abonament')
@@ -90,6 +91,7 @@ class Utilizatori(Base):
     adresa: Mapped[Optional[str]] = mapped_column(String(150))
     data_nasterii: Mapped[Optional[datetime.date]] = mapped_column(Date)
     telefon: Mapped[Optional[str]] = mapped_column(String(50), server_default=text("'Necompletat'::character varying"))
+    este_sters: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text('false'))
 
     nivele_abonament: Mapped[Optional['NiveleAbonament']] = relationship('NiveleAbonament', back_populates='utilizatori')
     carti: Mapped[list['Carti']] = relationship('Carti', back_populates='utilizatori')
@@ -128,6 +130,7 @@ class Carti(Base):
     url_imagine_coperta: Mapped[Optional[str]] = mapped_column(String(255))
     stare: Mapped[Optional[str]] = mapped_column(String(20), server_default=text("'ciorna'::character varying"))
     data_crearii: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime(True), server_default=text('CURRENT_TIMESTAMP'))
+    este_sters: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text('false'))
 
     utilizatori: Mapped[Optional['Utilizatori']] = relationship('Utilizatori', back_populates='carti')
     categorii: Mapped[list['Categorii']] = relationship('Categorii', secondary='categorii_carti', back_populates='carti')
@@ -293,6 +296,7 @@ class Capitole(Base):
     cost_puncte: Mapped[Optional[int]] = mapped_column(Integer, server_default=text('0'))
     stare: Mapped[Optional[str]] = mapped_column(String(20), server_default=text("'ciorna'::character varying"))
     data_crearii: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime(True), server_default=text('CURRENT_TIMESTAMP'))
+    este_sters: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text('false'))
 
     carti: Mapped[Optional['Carti']] = relationship('Carti', back_populates='capitole')
     comentarii: Mapped[list['Comentarii']] = relationship('Comentarii', back_populates='capitole')

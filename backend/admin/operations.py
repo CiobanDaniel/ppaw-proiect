@@ -42,6 +42,12 @@ def settings_edit_post(setare_id: int, nume_setare: str = Form(...), valoare_set
     return redirect_with_feedback('/setari', 'success', 'Setarea a fost actualizată.')
 
 
+@router.post('/setari/stergere/{setare_id}')
+def settings_delete_post(setare_id: int, accessor=Depends(get_settings_accessor)):
+    get_or_404(accessor.hard_delete(setare_id), 'Setarea')
+    return redirect_with_feedback('/setari', 'success', 'Setarea a fost ștearsă definitiv.')
+
+
 @router.get('/alerte')
 def alerts_index(request: Request, accessor=Depends(get_alerts_accessor)):
     return templates.TemplateResponse(request, 'admin/alerts/index.html', {'alerte': accessor.get_toate_alertele()})
@@ -68,6 +74,12 @@ def alerts_edit_get(request: Request, alerta_id: int, accessor=Depends(get_alert
 def alerts_edit_post(alerta_id: int, mesaj: str = Form(...), tip_alerta: str = Form('info'), accessor=Depends(get_alerts_accessor)):
     get_or_404(accessor.update_alerta(alerta_id, require_present(mesaj, 'Mesajul'), require_choice(tip_alerta, VALID_ALERT_TYPES, 'tipul alertei')), 'Alerta')
     return redirect_with_feedback('/alerte', 'success', 'Alerta a fost actualizată.')
+
+
+@router.post('/alerte/stergere/{alerta_id}')
+def alerts_delete_post(alerta_id: int, accessor=Depends(get_alerts_accessor)):
+    get_or_404(accessor.hard_delete(alerta_id), 'Alerta')
+    return redirect_with_feedback('/alerte', 'success', 'Alerta a fost ștearsă definitiv.')
 
 
 @router.get('/rapoarte')

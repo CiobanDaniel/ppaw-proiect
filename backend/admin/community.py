@@ -64,6 +64,12 @@ def users_edit_post(
     return redirect_with_feedback('/utilizatori', 'success', 'Utilizatorul a fost actualizat.')
 
 
+@router.post('/utilizatori/stergere/{user_id}')
+def users_delete_post(user_id: int, accessor=Depends(get_users_accessor)):
+    get_or_404(accessor.soft_delete(user_id), 'Utilizatorul')
+    return redirect_with_feedback('/utilizatori', 'success', 'Utilizatorul a fost șters logic.')
+
+
 @router.get('/recenzii')
 def reviews_index(request: Request, accessor=Depends(get_reviews_accessor)):
     return templates.TemplateResponse(request, 'admin/reviews/index.html', {'recenzii': accessor.get_toate_recenziile()})
@@ -83,6 +89,12 @@ def reviews_edit_post(rec_id: int, nota: int = Form(...), text_comentariu: str =
     return redirect_with_feedback('/recenzii', 'success', 'Recenzia a fost actualizată.')
 
 
+@router.post('/recenzii/stergere/{rec_id}')
+def reviews_delete_post(rec_id: int, accessor=Depends(get_reviews_accessor)):
+    get_or_404(accessor.hard_delete(rec_id), 'Recenzia')
+    return redirect_with_feedback('/recenzii', 'success', 'Recenzia a fost ștearsă definitiv.')
+
+
 @router.get('/comentarii')
 def comments_index(request: Request, accessor=Depends(get_comments_accessor)):
     return templates.TemplateResponse(request, 'admin/comments/index.html', {'comentarii': accessor.get_toate_comentariile()})
@@ -98,3 +110,9 @@ def comments_edit_get(request: Request, com_id: int, accessor=Depends(get_commen
 def comments_edit_post(com_id: int, continut: str = Form(...), accessor=Depends(get_comments_accessor)):
     get_or_404(accessor.update_comentariu(com_id, require_present(continut, 'Conținutul comentariului')), 'Comentariul')
     return redirect_with_feedback('/comentarii', 'success', 'Comentariul a fost actualizat.')
+
+
+@router.post('/comentarii/stergere/{com_id}')
+def comments_delete_post(com_id: int, accessor=Depends(get_comments_accessor)):
+    get_or_404(accessor.hard_delete(com_id), 'Comentariul')
+    return redirect_with_feedback('/comentarii', 'success', 'Comentariul a fost șters definitiv.')

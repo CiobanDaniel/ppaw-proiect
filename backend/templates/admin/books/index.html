@@ -26,6 +26,9 @@
             <td class="text-center">
                 <a href="/carti/detalii/{{ carte.id }}" class="btn btn-sm btn-outline-secondary">Detalii</a>
                 <a href="/carti/editare/{{ carte.id }}" class="btn btn-sm btn-outline-primary">Editare</a>
+                <form action="/carti/stergere/{{ carte.id }}" method="post" class="d-inline" onsubmit="return confirm('Ștergi logic cartea? Istoricul asociat rămâne în baza de date.');">
+                    <button class="btn btn-sm btn-outline-danger">Ștergere</button>
+                </form>
             </td>
         </tr>
         {% endfor %}

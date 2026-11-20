@@ -26,6 +26,9 @@
             <td class="text-center">
                 <a href="/utilizatori/detalii/{{ utilizator.id }}" class="btn btn-sm btn-outline-info">Detalii</a>
                 <a href="/utilizatori/editare/{{ utilizator.id }}" class="btn btn-sm btn-outline-primary">Editare</a>
+                <form action="/utilizatori/stergere/{{ utilizator.id }}" method="post" class="d-inline" onsubmit="return confirm('Ștergi logic utilizatorul? Istoricul rămâne în baza de date.');">
+                    <button class="btn btn-sm btn-outline-danger">Ștergere</button>
+                </form>
             </td>
         </tr>
         {% endfor %}

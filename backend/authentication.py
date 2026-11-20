@@ -62,6 +62,7 @@ def authenticate_admin(db: Session, identifier: str, password: str) -> Utilizato
     identifier = identifier.strip()
     admin = db.query(Utilizatori).filter(
         Utilizatori.rol == 'admin',
+        Utilizatori.este_sters.is_(False),
         or_(Utilizatori.nume_utilizator == identifier, Utilizatori.email == identifier),
     ).first()
     if not admin or not verify_password(password, admin.parola_hash):

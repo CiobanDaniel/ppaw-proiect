@@ -44,6 +44,12 @@ def subscriptions_edit_post(nivel_id: int, nume: str = Form(...), pret_real: flo
     return redirect_with_feedback('/abonamente', 'success', 'Nivelul de abonament a fost actualizat.')
 
 
+@router.post('/abonamente/stergere/{nivel_id}')
+def subscriptions_delete_post(nivel_id: int, accessor=Depends(get_levels_accessor)):
+    get_or_404(accessor.soft_delete(nivel_id), 'Nivelul de abonament')
+    return redirect_with_feedback('/abonamente', 'success', 'Nivelul de abonament a fost șters logic.')
+
+
 def validate_event(recompensa_puncte: int, data_inceput: str, data_sfarsit: str):
     inceput = parse_form_datetime(data_inceput, 'Data de început')
     sfarsit = parse_form_datetime(data_sfarsit, 'Data de sfârșit')
@@ -81,6 +87,12 @@ def events_edit_post(ev_id: int, nume: str = Form(...), recompensa_puncte: int =
     inceput, sfarsit = validate_event(recompensa_puncte, data_inceput, data_sfarsit)
     get_or_404(accessor.update_eveniment(ev_id, require_present(nume, 'Numele evenimentului'), recompensa_puncte, inceput, sfarsit, este_activ == 'on'), 'Evenimentul')
     return redirect_with_feedback('/evenimente', 'success', 'Evenimentul a fost actualizat.')
+
+
+@router.post('/evenimente/stergere/{ev_id}')
+def events_delete_post(ev_id: int, accessor=Depends(get_events_accessor)):
+    get_or_404(accessor.hard_delete(ev_id), 'Evenimentul')
+    return redirect_with_feedback('/evenimente', 'success', 'Evenimentul a fost șters definitiv.')
 
 
 @router.get('/plati')
