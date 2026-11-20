@@ -20,20 +20,22 @@ class CatalogPublicService:
         return self.db.query(Carti).options(
             joinedload(Carti.utilizatori),
             selectinload(Carti.categorii),
-        ).filter(Carti.stare == 'publicat').order_by(Carti.data_crearii.desc()).all()
+        ).filter(Carti.stare == 'publicat', Carti.este_sters.is_(False)).order_by(Carti.data_crearii.desc()).all()
 
     def get_carte_publicata(self, carte_id: int) -> Carti | None:
         return self.db.query(Carti).options(
             joinedload(Carti.utilizatori),
             selectinload(Carti.categorii),
             selectinload(Carti.capitole),
-        ).filter(Carti.id == carte_id, Carti.stare == 'publicat').first()
+        ).filter(Carti.id == carte_id, Carti.stare == 'publicat', Carti.este_sters.is_(False)).first()
 
     def get_capitol_gratuit(self, capitol_id: int) -> Capitole | None:
         capitol = self.db.query(Capitole).options(joinedload(Capitole.carti)).join(Carti).filter(
             Capitole.id == capitol_id,
             Capitole.stare == 'publicat',
+            Capitole.este_sters.is_(False),
             Carti.stare == 'publicat',
+            Carti.este_sters.is_(False),
         ).first()
         if capitol and not capitol.este_gratuit:
             raise CapitolBlocatError

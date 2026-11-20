@@ -117,8 +117,5 @@ def delete_categorie_api(
     _administrator=Depends(require_admin_api),
 ):
     accessor = CategoriiAccessor(db)
-    categorie = accessor.get_categorie_by_id(cat_id)
-    if not categorie:
+    if not accessor.hard_delete(cat_id):
         raise HTTPException(status_code=404, detail="Categoria nu a fost găsită.")
-    db.delete(categorie)
-    db.commit()
