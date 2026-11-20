@@ -30,6 +30,9 @@
             </td>
             <td class="text-center">
                 <a href="/evenimente/editare/{{ e.id }}" class="btn btn-sm btn-outline-primary">Modifică</a>
+                <form action="/evenimente/stergere/{{ e.id }}" method="post" class="d-inline" onsubmit="return confirm('Ștergi definitiv evenimentul promoțional?');">
+                    <button class="btn btn-sm btn-outline-danger">Ștergere</button>
+                </form>
             </td>
         </tr>
         {% endfor %}
