@@ -32,12 +32,12 @@ class UtilizatoriAccessor:
         self.db = db_session
 
     def get_all_users(self):
-        return self.db.query(Utilizatori).all()
+        return self.db.query(Utilizatori).filter(Utilizatori.este_sters.is_(False)).all()
 
     def get_user_by_id(self, user_id: int):
         # Returnează un singur utilizator pentru acțiunile Details și Edit (GET)
         from models import Utilizatori
-        return self.db.query(Utilizatori).filter(Utilizatori.id == user_id).first()
+        return self.db.query(Utilizatori).filter(Utilizatori.id == user_id, Utilizatori.este_sters.is_(False)).first()
 
     def add_entity(self, nume_utilizator: str, email: str, parola_hash: str, rol: str, telefon: str, adresa: str, data_nasterii):
         # Echivalentul AddEntity pentru acțiunea Create (POST)
@@ -71,13 +71,19 @@ class UtilizatoriAccessor:
             self.db.refresh(utilizator)
         return utilizator
 
-class CartiAccessor:
-    def __init__(self, db_session):
-        self.db = db_session
-
-    def get_books_by_author(self, author_id):
-        # Aici folosim relatia prin cheia straina (id_autor)
-        return self.db.query(Carti).filter(Carti.id_autor == author_id).all()
+    def soft_delete(self, user_id: int):
+        utilizator = self.get_user_by_id(user_id)
+        if not utilizator:
+            return None
+        if utilizator.rol == 'admin':
+            are_alt_admin = self.db.query(Utilizatori).filter(
+                Utilizatori.rol == 'admin', Utilizatori.este_sters.is_(False), Utilizatori.id != user_id,
+            ).first()
+            if not are_alt_admin:
+                raise AdminOperationError('Nu poate fi șters ultimul administrator activ.')
+        utilizator.este_sters = True
+        commit_or_raise(self.db, 'Utilizatorul nu a putut fi șters logic.')
+        return utilizator
 
 class CartiAccessor:
     def __init__(self, db_session):
@@ -86,22 +92,22 @@ class CartiAccessor:
     def get_books_by_author(self, author_id):
         # Aici folosim relatia prin cheia straina (id_autor)
         from models import Carti
-        return self.db.query(Carti).filter(Carti.id_autor == author_id).all()
+        return self.db.query(Carti).filter(Carti.id_autor == author_id, Carti.este_sters.is_(False)).all()
 
     def get_all_carti(self):
         # Extrage toate cărțile pentru Index
         from models import Carti
-        return self.db.query(Carti).all()
+        return self.db.query(Carti).filter(Carti.este_sters.is_(False)).all()
 
     def get_autori_pentru_dropdown(self):
         # Extrage utilizatorii pentru formularul de Create
         from models import Utilizatori
-        return self.db.query(Utilizatori).filter(Utilizatori.rol == 'autor').order_by(Utilizatori.nume_utilizator).all()
+        return self.db.query(Utilizatori).filter(Utilizatori.rol == 'autor', Utilizatori.este_sters.is_(False)).order_by(Utilizatori.nume_utilizator).all()
 
     def add_carte(self, titlu: str, id_autor: int, descriere: str, stare: str):
         # Salvează o carte nouă legată de un autor existent
         from models import Carti
-        autor = self.db.query(Utilizatori).filter(Utilizatori.id == id_autor, Utilizatori.rol == 'autor').first()
+        autor = self.db.query(Utilizatori).filter(Utilizatori.id == id_autor, Utilizatori.rol == 'autor', Utilizatori.este_sters.is_(False)).first()
         if not autor:
             raise AdminOperationError("Selectează un utilizator cu rolul «autor».")
         noua_carte = Carti(
@@ -115,12 +121,12 @@ class CartiAccessor:
 
     def get_carte_by_id(self, carte_id: int):
         from models import Carti
-        return self.db.query(Carti).filter(Carti.id == carte_id).first()
+        return self.db.query(Carti).filter(Carti.id == carte_id, Carti.este_sters.is_(False)).first()
 
     def update_carte(self, carte_id: int, titlu: str, id_autor: int, descriere: str, stare: str):
         carte = self.get_carte_by_id(carte_id)
         if carte:
-            autor = self.db.query(Utilizatori).filter(Utilizatori.id == id_autor, Utilizatori.rol == 'autor').first()
+            autor = self.db.query(Utilizatori).filter(Utilizatori.id == id_autor, Utilizatori.rol == 'autor', Utilizatori.este_sters.is_(False)).first()
             if not autor:
                 raise AdminOperationError("Selectează un utilizator cu rolul «autor».")
             carte.titlu = titlu
@@ -129,6 +135,14 @@ class CartiAccessor:
             carte.stare = stare
             commit_or_raise(self.db, "Cartea nu a putut fi actualizată. Verifică datele introduse.")
             self.db.refresh(carte)
+        return carte
+
+    def soft_delete(self, carte_id: int):
+        carte = self.get_carte_by_id(carte_id)
+        if not carte:
+            return None
+        carte.este_sters = True
+        commit_or_raise(self.db, 'Cartea nu a putut fi ștearsă logic.')
         return carte
 class CategoriiAccessor:
     def __init__(self, db_session):
@@ -157,6 +171,14 @@ class CategoriiAccessor:
             categorie.descriere = descriere
             self.db.commit()
             self.db.refresh(categorie)
+        return categorie
+
+    def hard_delete(self, cat_id: int):
+        categorie = self.get_categorie_by_id(cat_id)
+        if not categorie:
+            return None
+        self.db.delete(categorie)
+        commit_or_raise(self.db, 'Categoria nu a putut fi ștearsă.')
         return categorie
 
 class SetariAccessor:
@@ -188,6 +210,14 @@ class SetariAccessor:
             self.db.refresh(setare)
         return setare
 
+    def hard_delete(self, setare_id: int):
+        setare = self.get_setare_by_id(setare_id)
+        if not setare:
+            return None
+        self.db.delete(setare)
+        commit_or_raise(self.db, 'Setarea nu a putut fi ștearsă.')
+        return setare
+
 class AlerteAccessor:
     def __init__(self, db_session):
         self.db = db_session
@@ -217,6 +247,14 @@ class AlerteAccessor:
             self.db.refresh(alerta)
         return alerta
 
+    def hard_delete(self, alerta_id: int):
+        alerta = self.get_alerta_by_id(alerta_id)
+        if not alerta:
+            return None
+        self.db.delete(alerta)
+        commit_or_raise(self.db, 'Alerta nu a putut fi ștearsă.')
+        return alerta
+
 class CapitoleAccessor:
     def __init__(self, db_session):
         self.db = db_session
@@ -224,18 +262,20 @@ class CapitoleAccessor:
     def get_toate_capitolele(self):
         from models import Capitole
         # Sortăm după carte și apoi după numărul capitolului pentru o afișare logică
-        return self.db.query(Capitole).order_by(Capitole.id_carte, Capitole.numar_capitol).all()
+        return self.db.query(Capitole).filter(Capitole.este_sters.is_(False)).order_by(Capitole.id_carte, Capitole.numar_capitol).all()
 
     def get_capitol_by_id(self, cap_id: int):
         from models import Capitole
-        return self.db.query(Capitole).filter(Capitole.id == cap_id).first()
+        return self.db.query(Capitole).filter(Capitole.id == cap_id, Capitole.este_sters.is_(False)).first()
 
     def get_carti_pentru_dropdown(self):
         from models import Carti
-        return self.db.query(Carti).order_by(Carti.titlu).all()
+        return self.db.query(Carti).filter(Carti.este_sters.is_(False)).order_by(Carti.titlu).all()
 
     def add_capitol(self, id_carte: int, numar_capitol: int, titlu: str, continut: str, este_gratuit: bool, cost_puncte: int, stare: str):
-        from models import Capitole
+        from models import Capitole, Carti
+        if not self.db.query(Carti).filter(Carti.id == id_carte, Carti.este_sters.is_(False)).first():
+            raise AdminOperationError('Cartea selectată nu este disponibilă.')
         nou_capitol = Capitole(
             id_carte=id_carte,
             numar_capitol=numar_capitol,
@@ -250,8 +290,11 @@ class CapitoleAccessor:
         return nou_capitol
 
     def update_capitol(self, cap_id: int, id_carte: int, numar_capitol: int, titlu: str, continut: str, este_gratuit: bool, cost_puncte: int, stare: str):
+        from models import Carti
         capitol = self.get_capitol_by_id(cap_id)
         if capitol:
+            if not self.db.query(Carti).filter(Carti.id == id_carte, Carti.este_sters.is_(False)).first():
+                raise AdminOperationError('Cartea selectată nu este disponibilă.')
             capitol.id_carte = id_carte
             capitol.numar_capitol = numar_capitol
             capitol.titlu = titlu
@@ -261,6 +304,14 @@ class CapitoleAccessor:
             capitol.stare = stare
             self.db.commit()
             self.db.refresh(capitol)
+        return capitol
+
+    def soft_delete(self, cap_id: int):
+        capitol = self.get_capitol_by_id(cap_id)
+        if not capitol:
+            return None
+        capitol.este_sters = True
+        commit_or_raise(self.db, 'Capitolul nu a putut fi șters logic.')
         return capitol
 
 class RecenziiAccessor:
@@ -286,6 +337,14 @@ class RecenziiAccessor:
             self.db.refresh(recenzie)
         return recenzie
 
+    def hard_delete(self, rec_id: int):
+        recenzie = self.get_recenzie_by_id(rec_id)
+        if not recenzie:
+            return None
+        self.db.delete(recenzie)
+        commit_or_raise(self.db, 'Recenzia nu a putut fi ștearsă.')
+        return recenzie
+
 class ComentariiAccessor:
     def __init__(self, db_session):
         self.db = db_session
@@ -308,17 +367,25 @@ class ComentariiAccessor:
             self.db.refresh(comentariu)
         return comentariu
 
+    def hard_delete(self, com_id: int):
+        comentariu = self.get_comentariu_by_id(com_id)
+        if not comentariu:
+            return None
+        self.db.delete(comentariu)
+        commit_or_raise(self.db, 'Comentariul nu a putut fi șters.')
+        return comentariu
+
 class NiveleAccessor:
     def __init__(self, db_session):
         self.db = db_session
 
     def get_toate_nivelele(self):
         from models import NiveleAbonament
-        return self.db.query(NiveleAbonament).order_by(NiveleAbonament.pret_real).all()
+        return self.db.query(NiveleAbonament).filter(NiveleAbonament.este_sters.is_(False)).order_by(NiveleAbonament.pret_real).all()
 
     def get_nivel_by_id(self, nivel_id: int):
         from models import NiveleAbonament
-        return self.db.query(NiveleAbonament).filter(NiveleAbonament.id == nivel_id).first()
+        return self.db.query(NiveleAbonament).filter(NiveleAbonament.id == nivel_id, NiveleAbonament.este_sters.is_(False)).first()
 
     def add_nivel(self, nume: str, pret_real: float, descriere_beneficii: str):
         from models import NiveleAbonament
@@ -335,6 +402,14 @@ class NiveleAccessor:
             nivel.descriere_beneficii = descriere_beneficii
             self.db.commit()
             self.db.refresh(nivel)
+        return nivel
+
+    def soft_delete(self, nivel_id: int):
+        nivel = self.get_nivel_by_id(nivel_id)
+        if not nivel:
+            return None
+        nivel.este_sters = True
+        commit_or_raise(self.db, 'Nivelul de abonament nu a putut fi șters logic.')
         return nivel
 
 class EvenimenteAccessor:
@@ -367,6 +442,14 @@ class EvenimenteAccessor:
             self.db.commit()
             self.db.refresh(ev)
         return ev
+
+    def hard_delete(self, ev_id: int):
+        eveniment = self.get_eveniment_by_id(ev_id)
+        if not eveniment:
+            return None
+        self.db.delete(eveniment)
+        commit_or_raise(self.db, 'Evenimentul nu a putut fi șters.')
+        return eveniment
 
 class PlatiAccessor:
     def __init__(self, db_session):
