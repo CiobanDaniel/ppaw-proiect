@@ -54,6 +54,12 @@ def books_edit_post(
     return redirect_with_feedback('/carti', 'success', 'Cartea a fost actualizată.')
 
 
+@router.post('/carti/stergere/{carte_id}')
+def books_delete_post(carte_id: int, accessor=Depends(get_books_accessor)):
+    get_or_404(accessor.soft_delete(carte_id), 'Cartea')
+    return redirect_with_feedback('/carti', 'success', 'Cartea a fost ștearsă logic.')
+
+
 @router.get('/categorii')
 def categories_index(request: Request, accessor=Depends(get_categories_accessor)):
     return templates.TemplateResponse(request, 'admin/categories/index.html', {'categorii': accessor.get_toate_categoriile()})
@@ -80,6 +86,12 @@ def categories_edit_get(request: Request, cat_id: int, accessor=Depends(get_cate
 def categories_edit_post(cat_id: int, nume: str = Form(...), descriere: Optional[str] = Form(None), accessor=Depends(get_categories_accessor)):
     get_or_404(accessor.update_categorie(cat_id, require_present(nume, 'Numele categoriei'), descriere), 'Categoria')
     return redirect_with_feedback('/categorii', 'success', 'Categoria a fost actualizată.')
+
+
+@router.post('/categorii/stergere/{cat_id}')
+def categories_delete_post(cat_id: int, accessor=Depends(get_categories_accessor)):
+    get_or_404(accessor.hard_delete(cat_id), 'Categoria')
+    return redirect_with_feedback('/categorii', 'success', 'Categoria a fost ștearsă definitiv.')
 
 
 def validate_chapter(numar_capitol: int, cost_puncte: int, stare: str, este_gratuit: Optional[str]) -> bool:
@@ -135,3 +147,9 @@ def chapters_edit_post(
     is_free = validate_chapter(numar_capitol, cost_puncte, stare, este_gratuit)
     get_or_404(accessor.update_capitol(cap_id, id_carte, numar_capitol, require_present(titlu, 'Titlul'), require_present(continut, 'Conținutul'), is_free, cost_puncte, stare), 'Capitolul')
     return redirect_with_feedback('/capitole', 'success', 'Capitolul a fost actualizat.')
+
+
+@router.post('/capitole/stergere/{cap_id}')
+def chapters_delete_post(cap_id: int, accessor=Depends(get_chapters_accessor)):
+    get_or_404(accessor.soft_delete(cap_id), 'Capitolul')
+    return redirect_with_feedback('/capitole', 'success', 'Capitolul a fost șters logic.')
