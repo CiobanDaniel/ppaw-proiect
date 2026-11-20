@@ -30,6 +30,9 @@
             <td><small>{{ c.data_crearii.strftime('%d-%m-%Y %H:%M') if c.data_crearii else '-' }}</small></td>
             <td class="text-center">
                 <a href="/comentarii/editare/{{ c.id }}" class="btn btn-sm btn-outline-info text-dark">Moderează</a>
+                <form action="/comentarii/stergere/{{ c.id }}" method="post" class="d-inline" onsubmit="return confirm('Ștergi definitiv comentariul?');">
+                    <button class="btn btn-sm btn-outline-danger">Ștergere</button>
+                </form>
             </td>
         </tr>
         {% endfor %}
